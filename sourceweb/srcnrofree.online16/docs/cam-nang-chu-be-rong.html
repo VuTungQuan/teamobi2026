@@ -1,0 +1,734 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{margin:0}</style></head><body><title>Cẩm nang Chú Bé Rồng</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Be+Vietnam+Pro:wght@400;500;600&display=swap">
+<style>
+/* Layout: mục lục dính bên trái, nội dung một cột đọc bên phải; trên điện thoại mục lục thu vào một khối mở/đóng ở đầu trang. */
+:root {
+  --bg: #fbf8f4; --surface: #ffffff; --ink: #2a1709; --muted: #7a6352; --line: #ead9c6;
+  --accent: #e4520b; --accent-ink: #b03d05; --band: #fff0dc; --brown: #7b3a1d;
+  --display: "Baloo 2", "Be Vietnam Pro", system-ui, sans-serif;
+  --body: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #17100b; --surface: #211710; --ink: #f4e8dc; --muted: #b59f8c; --line: #3a2a1e;
+  --accent: #ff7d3a; --accent-ink: #ffa066; --band: #2e2015; --brown: #e3a779; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #17100b; --surface: #211710; --ink: #f4e8dc; --muted: #b59f8c; --line: #3a2a1e;
+  --accent: #ff7d3a; --accent-ink: #ffa066; --band: #2e2015; --brown: #e3a779; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.65; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 64px; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 40px; }
+a { color: var(--accent-ink); text-underline-offset: 2px }
+a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px }
+
+/* Mục lục */
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); align-self: start; max-height: calc(100vh - 32px); overflow-y: auto; font-size: 14px; }
+.toc summary { font-family: var(--display); font-weight: 700; font-size: 17px; color: var(--brown); cursor: pointer; list-style: none; padding-bottom: 8px }
+.toc summary::-webkit-details-marker { display: none }
+.toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; border-left: 2px solid var(--line) }
+.toc a { display: block; padding: 5px 12px; margin-left: -2px; border-left: 2px solid transparent; color: var(--muted); text-decoration: none }
+.toc a:hover { color: var(--ink) }
+.toc a.on { color: var(--accent-ink); border-left-color: var(--accent); font-weight: 600 }
+
+main { min-width: 0; max-width: 800px }
+header.top { border-bottom: 3px solid var(--accent); padding-bottom: 20px; margin-bottom: 8px }
+.eyebrow { text-transform: uppercase; letter-spacing: .09em; font-size: 12px; font-weight: 600; color: var(--muted) }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(34px, 6vw, 52px); line-height: 1.05; margin: 6px 0 10px; color: var(--brown); text-wrap: balance }
+.lede { font-size: 17px; max-width: 62ch; margin: 0 }
+.facts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; padding: 0; list-style: none }
+.facts li { background: var(--band); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 500 }
+.facts b { color: var(--accent-ink) }
+
+section { padding-top: 34px }
+h2 { font-family: var(--display); font-weight: 700; font-size: 28px; line-height: 1.15; margin: 0 0 6px; color: var(--brown); text-wrap: balance; scroll-margin-top: 16px }
+h3 { font-family: var(--display); font-weight: 600; font-size: 19px; margin: 26px 0 6px; text-wrap: balance }
+p { margin: 8px 0; max-width: 68ch }
+ul, ol.steps { margin: 8px 0; padding-left: 22px; max-width: 70ch }
+li { margin: 3px 0 }
+code { font-family: ui-monospace, Consolas, monospace; font-size: .92em; background: var(--band); border: 1px solid var(--line); padding: 1px 6px; border-radius: 4px }
+
+.tbl { overflow-x: auto; margin: 12px 0; border: 1px solid var(--line); border-radius: 8px; background: var(--surface) }
+table { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top }
+thead th { background: var(--band); font-weight: 600; white-space: nowrap; color: var(--brown) }
+tbody tr:last-child td { border-bottom: 0 }
+td.n, th.n { text-align: right; white-space: nowrap }
+
+.note { background: var(--band); border-left: 4px solid var(--accent); padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 14px 0; max-width: 70ch }
+.note b:first-child { color: var(--accent-ink) }
+footer { margin-top: 44px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px }
+
+@media (max-width: 860px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 16px; padding-inline: 16px; padding-block: 16px 48px }
+  .toc { position: static; max-height: none; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px }
+  .toc summary { padding-bottom: 0 }
+  .toc[open] summary { padding-bottom: 8px }
+  h2 { font-size: 24px }
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth } }
+</style>
+
+<div class="wrap">
+<details class="toc" id="toc" open>
+  <summary>Mục lục</summary>
+  <ol>
+    <li><a href="#bat-dau">Bắt đầu nhanh</a></li>
+    <li><a href="#nhiem-vu">Nhiệm vụ chính</a></li>
+    <li><a href="#ban-do">Bản đồ và di chuyển</a></li>
+    <li><a href="#suc-manh">Sức mạnh và giới hạn</a></li>
+    <li><a href="#de-tu">Đệ tử</a></li>
+    <li><a href="#hop-the">Hợp thể, bông tai Porata</a></li>
+    <li><a href="#trang-bi">Trang bị và nâng cấp</a></li>
+    <li><a href="#skh">Set kích hoạt</a></li>
+    <li><a href="#than-linh">Thần Linh, Hủy Diệt, Thiên Sứ</a></li>
+    <li><a href="#cai-trang">Cải trang, phụ kiện, bùa</a></li>
+    <li><a href="#boss">Boss</a></li>
+    <li><a href="#pho-ban">Phó bản bang hội</a></li>
+    <li><a href="#lich">Lịch hoạt động trong ngày</a></li>
+    <li><a href="#rong-than">Rồng thần</a></li>
+    <li><a href="#kinh-te">Vàng, ngọc, thỏi vàng</a></li>
+    <li><a href="#lenh">Lệnh chat và mẹo</a></li>
+  </ol>
+</details>
+
+<main>
+<header class="top">
+  <div class="eyebrow">Hướng dẫn chơi · cat.io.vn</div>
+  <h1>Cẩm nang Chú Bé Rồng</h1>
+  <p class="lede">Từ lúc tạo nhân vật đến đồ Thiên Sứ: nhiệm vụ, bản đồ, đệ tử, set kích hoạt, cải trang, boss và lịch hoạt động của server.</p>
+  <ul class="facts">
+    <li>Kinh nghiệm <b>x4</b></li>
+    <li>Giftcode tân thủ <b>tanthu</b></li>
+    <li>Điểm danh <b>10.000 ngọc + 100 thỏi vàng</b> mỗi ngày</li>
+    <li>Nhiệm vụ bang <b>không cần bang</b></li>
+  </ul>
+</header>
+
+<section>
+<h2 id="bat-dau">Bắt đầu nhanh</h2>
+<h3>Chọn hành tinh</h3>
+<div class="tbl"><table>
+<thead><tr><th>Hành tinh</th><th class="n">HP gốc</th><th class="n">KI gốc</th><th class="n">Sức đánh</th><th>Kỹ năng riêng</th></tr></thead>
+<tbody>
+<tr><td><b>Trái Đất</b></td><td class="n">200</td><td class="n">100</td><td class="n">10</td><td>Kamejoko, Thái Dương Hạ San, Kaioken, Quả cầu kênh khi, Dịch chuyển tức thời, Thôi miên</td></tr>
+<tr><td><b>Namếc</b></td><td class="n">100</td><td class="n">200</td><td class="n">10</td><td>Masenko, Trị thương, Makankosappo, Đẻ trứng, Liên hoàn, Biến Sôcôla</td></tr>
+<tr><td><b>Xayda</b></td><td class="n">100</td><td class="n">100</td><td class="n">15</td><td>Antomic, Tái tạo năng lượng, Biến hình (khỉ), Tự phát nổ, Huýt sáo, Trói</td></tr>
+</tbody></table></div>
+<p>Nhân vật mới có 2.000 vàng, 10.000 ngọc, 10 đậu thần cấp 5 và một Rada cấp 1 trong rương đồ.</p>
+
+<h3>Năm việc nên làm ngay</h3>
+<ol class="steps">
+  <li><b>Nhập giftcode <code>tanthu</code></b> ở NPC Santa (Đảo Kamê, Đảo Guru hoặc Vách núi đen), mục "Nhập mã quà tặng". Nhận 50 thỏi vàng và 10 cái mỗi loại Cuồng nộ, Bổ huyết, Bổ khí, Giáp Xên bọ hung, Ẩn danh.</li>
+  <li><b>Điểm danh ở Bò Mộng</b> (Rừng Karin hoặc Siêu thị) mỗi ngày: 10.000 ngọc và 100 thỏi vàng.</li>
+  <li><b>Nhận bùa 1 giờ miễn phí</b> mỗi ngày ở Bà Hạt Mít tại Vách núi (cạnh nhà).</li>
+  <li><b>Làm nhiệm vụ chính</b> để mở bản đồ. Nhiều map bị khóa cho tới khi xong nhiệm vụ tương ứng.</li>
+  <li><b>Săn Super Broly</b> để có đệ tử. Xem mục <a href="#de-tu">Đệ tử</a>.</li>
+</ol>
+<div class="note"><b>Mẹo.</b> Thỏi vàng bán cho shop được 37 triệu vàng mỗi thỏi. Riêng 100 thỏi điểm danh mỗi ngày đã là 3,7 tỷ vàng, đủ để mua đồ shop và nâng cấp giai đoạn đầu.</div>
+
+<h3>Mốc học kỹ năng</h3>
+<div class="tbl"><table>
+<thead><tr><th>Kỹ năng</th><th class="n">Sức mạnh cần</th></tr></thead>
+<tbody>
+<tr><td>Chiêu đấm (Dragon / Demon / Galick)</td><td class="n">1.000</td></tr>
+<tr><td>Chưởng (Kamejoko / Masenko / Antomic)</td><td class="n">10.000</td></tr>
+<tr><td>Thái Dương Hạ San / Trị thương / Tái tạo năng lượng</td><td class="n">60.000</td></tr>
+<tr><td>Liên hoàn, Sôcôla, Khiên, Dịch chuyển, Thôi miên, Huýt sáo, Trói</td><td class="n">10 triệu</td></tr>
+<tr><td>Kaioken / Makankosappo</td><td class="n">150 triệu</td></tr>
+<tr><td>Biến hình / Tự phát nổ</td><td class="n">250 triệu</td></tr>
+<tr><td>Quả cầu kênh khi / Đẻ trứng</td><td class="n">500 triệu</td></tr>
+<tr><td>Tuyệt kỹ (Super Kamejoko, Ma phong ba, Liên hoàn chưởng)</td><td class="n">60 tỷ</td></tr>
+</tbody></table></div>
+<p>Sách kỹ năng bán ở Uron (Trạm tàu vũ trụ, Siêu thị) bằng ngọc. Sách chưởng cấp 1 được tặng khi xong nhiệm vụ 10.</p>
+</section>
+
+<section>
+<h2 id="nhiem-vu">Nhiệm vụ chính</h2>
+<p>Nhận và trả nhiệm vụ ở ông nội (trong nhà) cho tới nhiệm vụ 8, sau đó ở sư phụ: Quy Lão Kame (Trái Đất), Trưởng lão Guru (Namếc), Vua Vegeta (Xayda).</p>
+<div class="tbl"><table>
+<thead><tr><th class="n">NV</th><th>Tên</th><th>Việc cần làm</th></tr></thead>
+<tbody>
+<tr><td class="n">0</td><td>Nhiệm vụ đầu tiên</td><td>Đi theo mũi tên, vào nhà nói chuyện ông, mở rương đồ, thu hoạch đậu thần</td></tr>
+<tr><td class="n">1</td><td>Tập luyện</td><td>Đánh 5 Mộc nhân ở làng</td></tr>
+<tr><td class="n">2</td><td>Tìm thức ăn</td><td>Nhặt 10 Đùi gà ở Đồi hoa cúc / Đồi nấm tím / Đồi hoang</td></tr>
+<tr><td class="n">3</td><td>Sao băng</td><td>Cộng tiềm năng 1 lần, nhặt Đứa bé ở Vách núi</td></tr>
+<tr><td class="n">4–6</td><td>Thử thách</td><td>3 Khủng long mẹ, 3 Lợn lòi mẹ, 3 Quỷ đất mẹ. Đi tàu vũ trụ sang hành tinh khác</td></tr>
+<tr><td class="n">7</td><td>Giải cứu</td><td>Đạt 16.000 SM, hạ 20 Thằn lằn bay / Phi long / Quỷ bay, nói chuyện Bunma / Dende / Appule (nhận gói Capsule)</td></tr>
+<tr><td class="n">8</td><td>Tìm ngọc</td><td>Đạt 40.000 SM, nhặt Ngọc rồng 7 sao rơi từ Phi long mẹ / Quỷ bay mẹ / Thằn lằn mẹ</td></tr>
+<tr><td class="n">9</td><td>Bái sư</td><td>Tới Đảo Kamê / Đảo Guru / Vách núi đen chào sư phụ</td></tr>
+<tr><td class="n">10</td><td>Thử sức</td><td>Đạt 200.000 SM, diệt 10 Ốc mượn hồn / Ốc sên / Heo Xayda mẹ (nhận sách chưởng)</td></tr>
+<tr><td class="n">11</td><td>Gia tăng sức mạnh</td><td>Đạt 500.000, 550.000, 600.000 SM rồi báo cáo</td></tr>
+<tr><td class="n">12</td><td>Xin phép</td><td>Về nhà nói chuyện ông, báo sư phụ</td></tr>
+<tr><td class="n">13</td><td>Gia nhập bang hội</td><td><b>Không cần bang:</b> nói chuyện với Quy Lão Kame là xong bước đầu, sau đó báo sư phụ của hành tinh mình</td></tr>
+<tr><td class="n">14</td><td>Bang hội đầu tiên</td><td>30 Heo rừng (Rừng Bamboo), 30 Heo da xanh (Núi hoa vàng), 30 Heo Xayda (Rừng cọ). <b>Không cần bang</b></td></tr>
+<tr><td class="n">15</td><td>Bang hội thứ 2</td><td>30 Bulon (Đảo Bulông), 30 Ukulele (Đông Nam Guru), 30 Quỷ mập (Bờ vực đen). <b>Không cần bang</b></td></tr>
+<tr><td class="n">16</td><td>Tiêu diệt quái</td><td>Tambourine (Đông Karin), Drum (Thung lũng Namếc), Akkuman (Thành phố Vegeta)</td></tr>
+<tr><td class="n">17</td><td>Giúp Cui</td><td>Nói chuyện Cui ở Thành phố Vegeta</td></tr>
+<tr><td class="n">18</td><td>Bất khả thi</td><td>500 Nappa, 400 Soldier, 300 Appule, 200 Raspberry, 100 Thằn lằn xanh</td></tr>
+<tr><td class="n">19</td><td>Diệt đệ tử Fide</td><td>Kuku, Mập Đầu Đinh, Rambo. Cui ở Thành phố Vegeta đưa tới chỗ boss với giá 50 triệu vàng</td></tr>
+<tr><td class="n">20</td><td>Tiểu đội sát thủ</td><td>Đạt 600 triệu SM, hạ Số 4, Số 3, Số 2, Số 1, Tiểu đội trưởng</td></tr>
+<tr><td class="n">21</td><td>Fide đại ca</td><td>Đạt 2 tỷ SM, hạ Fide cấp 1, 2, 3 ở Núi khỉ vàng</td></tr>
+<tr><td class="n">22</td><td>Chú bé tương lai</td><td>Tìm Calích (Rừng Bamboo đến Nam Kamê), tới tương lai gặp Bunma, diệt 1.000 Xên con cấp 1</td></tr>
+<tr><td class="n">23</td><td>Robot sát thủ lần 1</td><td>Android 19, Dr.Kôrê, 900 Xên con cấp 3</td></tr>
+<tr><td class="n">24</td><td>Robot sát thủ lần 2</td><td>Android 15, 14, 13 ở Sân sau siêu thị</td></tr>
+<tr><td class="n">25</td><td>Robot sát thủ lần 3</td><td>Póc, Píc, King Kong, 800 Xên con cấp 5</td></tr>
+<tr><td class="n">26</td><td>Xên bọ hung</td><td>Xên cấp 1, 2, hoàn thiện ở Thị trấn Ginder, 700 Xên con cấp 8</td></tr>
+<tr><td class="n">27</td><td>Cuộc dạo chơi của Xên</td><td>Nói chuyện Thần mèo Karin để qua bước đầu, nhặt 50 Capsule kì bí, hạ 7 Xên con và Siêu Bọ Hung ở Võ đài Xên</td></tr>
+<tr><td class="n">28</td><td>Đối đầu không cân sức</td><td>Vào Mabư 12h qua Ôsin, hạ mỗi boss 10 lần: Drabura, Pui Pui, Yacôn, Mabư</td></tr>
+</tbody></table></div>
+<p>Nhiệm vụ 14 và 15 đếm gấp đôi nếu có từ 2 người cùng bang đứng chung khu. Capsule kì bí rơi từ quái ở tương lai khi đang bật Máy dò (5 triệu vàng ở Bunma tương lai, Nhà Bunma).</p>
+<p><b>Thưởng:</b> mỗi nhiệm vụ từ 1 đến 24 cho sức mạnh, tiềm năng và 200.000 đến 500.000 vàng.</p>
+
+<h3>Bản đồ mở theo nhiệm vụ</h3>
+<div class="tbl"><table>
+<thead><tr><th>Bản đồ</th><th class="n">Mở khi tới</th></tr></thead>
+<tbody>
+<tr><td>Đồi hoa cúc, Đồi nấm tím, Đồi hoang</td><td class="n">NV 1</td></tr>
+<tr><td>Vách núi (Bà Hạt Mít)</td><td class="n">NV 2</td></tr>
+<tr><td>Trạm tàu vũ trụ</td><td class="n">NV 4</td></tr>
+<tr><td>Rừng nấm, Thung lũng Maima, Rừng nguyên sinh</td><td class="n">NV 7</td></tr>
+<tr><td>Rừng Bamboo, Rừng dương xỉ, Núi hoa vàng, Núi hoa tím, Rừng cọ, Rừng đá</td><td class="n">NV 13</td></tr>
+<tr><td>Đảo Bulông, Đông Nam Guru, Bờ vực đen</td><td class="n">NV 15</td></tr>
+<tr><td>Đông Karin, Thung lũng Namếc, Thành phố Vegeta</td><td class="n">NV 16</td></tr>
+<tr><td>Vùng Nappa (Thung lũng Nappa, Vực cấm, Núi Appule…)</td><td class="n">NV 18</td></tr>
+<tr><td>Vùng Fide và vùng khỉ</td><td class="n">NV 19</td></tr>
+<tr><td>Núi khỉ vàng, các thành phố tương lai, Nhà Bunma</td><td class="n">NV 21</td></tr>
+<tr><td>Thành phố phía bắc đến Thị trấn Ginder</td><td class="n">NV 24</td></tr>
+<tr><td>Võ đài Xên, vùng Cold, Hành tinh Bill</td><td class="n">NV 27</td></tr>
+</tbody></table></div>
+</section>
+
+<section>
+<h2 id="ban-do">Bản đồ và di chuyển</h2>
+<h3>Ba hành tinh</h3>
+<div class="tbl"><table>
+<thead><tr><th>Hành tinh</th><th>Làng và sư phụ</th><th>Bãi quái theo thứ tự</th></tr></thead>
+<tbody>
+<tr><td><b>Trái Đất</b></td><td>Làng Aru (Bunma, Mr.PôPô), Đảo Kamê (Quy Lão, Santa, Bà Hạt Mít, Chi Chi)</td><td>Đồi hoa cúc, Thung lũng tre, Rừng nấm, Rừng xương, Đông Karin, Rừng Bamboo, Rừng dương xỉ, Nam Kamê, Đảo Bulông</td></tr>
+<tr><td><b>Namếc</b></td><td>Làng Mori (Dende), Đảo Guru (Trưởng lão Guru, Santa), Vách núi Moori (Quốc Vương)</td><td>Đồi nấm tím, Thị trấn Moori, Thung lũng Maima, Vực Maima, Thung lũng Namếc, Núi hoa vàng, Núi hoa tím, Nam Guru, Đông Nam Guru</td></tr>
+<tr><td><b>Xayda</b></td><td>Làng Kakarot (Appule), Vách núi đen (Vua Vegeta, Santa), Thành phố Vegeta (Cui, Tapion)</td><td>Đồi hoang, Làng Plant, Rừng nguyên sinh, Rừng thông, Rừng cọ, Rừng đá, Thung lũng đen, Bờ vực đen</td></tr>
+</tbody></table></div>
+
+<h3>Khu vực nâng cao</h3>
+<div class="tbl"><table>
+<thead><tr><th>Khu vực</th><th>Cách vào</th><th>Có gì</th></tr></thead>
+<tbody>
+<tr><td>Siêu thị</td><td>Tàu vũ trụ hoặc Capsule</td><td>Đủ shop 3 hành tinh, Uron, Bò Mộng, Bà Hạt Mít, Cửa hàng ký gửi</td></tr>
+<tr><td>Vùng Nappa, Fide, khỉ</td><td>Cui ở Thành phố Vegeta</td><td>Quái cấp 9 đến 16, boss Kuku, Mập Đầu Đinh, Rambo, Tiểu đội sát thủ, Fide</td></tr>
+<tr><td>Tương lai</td><td>Calích (Rừng Bamboo đến Nam Kamê)</td><td>Xên con cấp 1 đến 8, Android, Black Goku, Xên bọ hung. Chết ở đây bị trừ sức mạnh</td></tr>
+<tr><td>Cold</td><td>Cui ở Thành phố Vegeta, cần NV 27</td><td>Đá nâng cấp, đồ Thần Linh, boss Cooler. HP và sức đánh bị giảm 50%, cần cải trang chống lạnh</td></tr>
+<tr><td>Tháp Karin, Thần điện</td><td>Rừng Karin, bay lên đỉnh tháp</td><td>Luyện tập, Vòng quay may mắn (Thượng Đế)</td></tr>
+<tr><td>Hành tinh Kaio</td><td>Thượng Đế ở Thần điện</td><td>Thần Vũ Trụ, Bill</td></tr>
+<tr><td>Thánh địa Kaio</td><td>Thần Vũ Trụ</td><td>Tổ sư Kaio (mở giới hạn bậc 5 đến 9), Ôsin</td></tr>
+<tr><td>Hành tinh Bill, Ngục tù</td><td>Ôsin ở Thánh địa Kaio, cần NV 27</td><td>Whis, mảnh Thiên Sứ, Bí kíp tuyệt kỹ, boss Cumber</td></tr>
+<tr><td>Tây / Đông / Bắc / Nam thánh địa</td><td>Giu-ma Đầu Bò ở Lãnh địa bang, cần 40 tỷ SM</td><td>Mảnh vỡ và mảnh hồn bông tai Porata</td></tr>
+<tr><td>Yardrat</td><td>Goku SSJ ở Núi khỉ vàng</td><td>Bí kiếp, đổi 9.999 bí kiếp lấy võ phục Yardrat</td></tr>
+<tr><td>Thành phố Santa</td><td>Tapion ở Thành phố Vegeta</td><td>Hirudegarn: trứng Mabư, Bình hút năng lượng</td></tr>
+<tr><td>Map riêng tư</td><td>Vé 1.999 ngọc ở Santa</td><td>Bãi săn set kích hoạt riêng</td></tr>
+<tr><td>Lãnh địa bang</td><td>Quy Lão Kame, "Về khu vực bang"</td><td>Giu-ma Đầu Bò, nhiệm vụ bang, shop bang</td></tr>
+</tbody></table></div>
+
+<h3>Di chuyển</h3>
+<ul>
+  <li><b>Tàu vũ trụ:</b> Dr.Brief (Trái Đất), Cargo (Namếc), Cui (Xayda) ở Trạm tàu vũ trụ đưa sang hành tinh khác và Siêu thị.</li>
+  <li><b>Capsule:</b> mở danh sách điểm đến gồm nhà, 3 làng, Đảo Kamê, Đảo Guru, Vách núi đen, Rừng Karin, Thần điện, Siêu thị, Đại hội võ thuật, Hành tinh Bill. Vẫn phải qua khóa nhiệm vụ. Capsule đặc biệt dùng vĩnh viễn giá 1.000 ngọc ở shop làng.</li>
+</ul>
+</section>
+
+<section>
+<h2 id="suc-manh">Sức mạnh và giới hạn</h2>
+<p>Sức mạnh tối đa phụ thuộc bậc giới hạn. Chạm trần thì mỗi lần đánh chỉ nhận 10 tiềm năng, nên cần mở giới hạn sớm.</p>
+<div class="tbl"><table>
+<thead><tr><th class="n">Bậc</th><th class="n">Trần sức mạnh</th><th class="n">HP/KI gốc</th><th class="n">Sức đánh gốc</th><th class="n">Giáp</th><th class="n">Chí mạng</th></tr></thead>
+<tbody>
+<tr><td class="n">0</td><td class="n">18 tỷ</td><td class="n">220.000</td><td class="n">11.000</td><td class="n">550</td><td class="n">1</td></tr>
+<tr><td class="n">1</td><td class="n">20 tỷ</td><td class="n">240.000</td><td class="n">12.000</td><td class="n">600</td><td class="n">2</td></tr>
+<tr><td class="n">2</td><td class="n">25 tỷ</td><td class="n">300.000</td><td class="n">15.000</td><td class="n">700</td><td class="n">3</td></tr>
+<tr><td class="n">3</td><td class="n">30 tỷ</td><td class="n">350.000</td><td class="n">18.000</td><td class="n">800</td><td class="n">4</td></tr>
+<tr><td class="n">4</td><td class="n">40 tỷ</td><td class="n">400.000</td><td class="n">20.000</td><td class="n">1.000</td><td class="n">5</td></tr>
+<tr><td class="n">5</td><td class="n">50 tỷ</td><td class="n">450.000</td><td class="n">22.000</td><td class="n">1.200</td><td class="n">6</td></tr>
+<tr><td class="n">6</td><td class="n">60 tỷ</td><td class="n">500.000</td><td class="n">24.000</td><td class="n">1.400</td><td class="n">7</td></tr>
+<tr><td class="n">7</td><td class="n">70 tỷ</td><td class="n">525.000</td><td class="n">24.500</td><td class="n">1.500</td><td class="n">8</td></tr>
+<tr><td class="n">8</td><td class="n">80 tỷ</td><td class="n">550.000</td><td class="n">25.000</td><td class="n">1.600</td><td class="n">9</td></tr>
+<tr><td class="n">9</td><td class="n">90 tỷ</td><td class="n">575.000</td><td class="n">26.000</td><td class="n">1.800</td><td class="n">10</td></tr>
+</tbody></table></div>
+<h3>Mở giới hạn</h3>
+<ul>
+  <li><b>Bậc 0 đến 5:</b> Quốc Vương ở Vách núi Moori. Cách thường phải chạm trần rồi chờ 2,4 giờ. "Nâng ngay" tốn 50 triệu vàng.</li>
+  <li><b>Bậc 5 đến 9:</b> Tổ sư Kaio ở Thánh địa Kaio, cùng giá.</li>
+  <li>Mở giới hạn cho đệ tử cũng ở hai NPC này, 50 triệu vàng mỗi bậc.</li>
+</ul>
+<p>Từ 40 tỷ sức mạnh trở lên, tiềm năng nhận được từ quái giảm mạnh theo từng mốc. Bùa Trí Tuệ và thời gian VIP giúp bù lại.</p>
+
+<h3>Cộng tiềm năng và nội tại</h3>
+<ul>
+  <li>Mỗi điểm HP hoặc KI cộng 20. Sức đánh, giáp và chí mạng càng cao càng tốn tiềm năng.</li>
+  <li><b>Nội tại:</b> bấm nút Nội tại trên giao diện khi đạt 10 tỷ SM. Đổi bằng vàng với giá tăng dần từ 10 triệu đến 1,28 tỷ, hoặc mở VIP 100 ngọc (đồng thời đưa giá vàng về mức đầu).</li>
+  <li>Nội tại gồm tăng sát thương hoặc hồi chiêu cho từng kỹ năng, tăng vàng rơi, tăng SM/TN khi đánh quái, chí mạng liên tục khi HP thấp.</li>
+</ul>
+
+<h3>Luyện tập</h3>
+<p>Thách đấu lần lượt Thần mèo Karin, Yajirô (Tháp Karin), Mr.PôPô, Thượng Đế (Thần điện), Khỉ Bubbles, Thần Vũ Trụ (Hành tinh Kaio), Tổ sư Kaio. Thoát game ngay tại các map luyện tập sẽ được cộng sức mạnh mỗi phút, tối đa 24 giờ. Thầy càng cao càng nhiều: Karin 20, Yajirô 40, PôPô 80, Thượng Đế 160, Bubbles 320, Thần Vũ Trụ 640, Tổ sư Kaio từ 1.280 mỗi phút.</p>
+
+<h3>Danh hiệu theo sức mạnh</h3>
+<div class="tbl"><table>
+<thead><tr><th>Sức mạnh</th><th>Danh hiệu</th></tr></thead>
+<tbody>
+<tr><td>Dưới 1,5 triệu</td><td>Tân thủ, Tập sự, Tân binh, Chiến binh, Vệ binh</td></tr>
+<tr><td>1,5 triệu đến 15 triệu</td><td>Vệ binh hoàng gia</td></tr>
+<tr><td>15 triệu đến 10 tỷ</td><td>Siêu nhân / Siêu Namếc / Siêu Xayda cấp 1 đến 4</td></tr>
+<tr><td>10 tỷ đến 60 tỷ</td><td>Thần cấp 1 đến 3</td></tr>
+<tr><td>60 tỷ đến 90 tỷ</td><td>Giới Vương Thần cấp 1 đến 3</td></tr>
+<tr><td>Từ 90 tỷ</td><td>Thiên đạo</td></tr>
+</tbody></table></div>
+</section>
+
+<section>
+<h2 id="de-tu">Đệ tử</h2>
+<h3>Cách có đệ tử</h3>
+<ul>
+  <li><b>Hạ Super Broly khi chưa có đệ.</b> Server có 30 Broly ở Đảo Kamê, Đảo Guru, Vách núi đen và các bãi từ Rừng Bamboo đến Bờ vực đen, chỉ xuất hiện từ khu 2 trở lên. Đánh Broly chết thì Super Broly hiện ra tại chỗ. Người hạ Super Broly nhận đệ tử thường. Không yêu cầu sức mạnh hay nhiệm vụ.</li>
+  <li>Super Broly chỉ mất tối đa 1% HP mỗi đòn, nên đánh nhanh tay quan trọng hơn đánh mạnh.</li>
+  <li><b>Gói VIP ở ToriBot</b> (làng) tặng đệ thường nếu chưa có. VIP 4 tặng trứng Mabư.</li>
+</ul>
+
+<h3>Các loại đệ tử</h3>
+<div class="tbl"><table>
+<thead><tr><th>Loại</th><th class="n">SM khởi điểm</th><th>Điểm mạnh</th><th>Cách có</th></tr></thead>
+<tbody>
+<tr><td><b>Đệ thường</b></td><td class="n">2.000</td><td>7 ô trang bị</td><td>Super Broly, VIP ToriBot</td></tr>
+<tr><td><b>Mabư</b></td><td class="n">1,5 triệu</td><td>Sức đánh gốc cao hơn (50 đến 120), biến hình</td><td>Quả trứng (rơi 20% từ Hirudegarn ở Thành phố Santa, hoặc VIP 4). Trứng nở sau 10 ngày, hoặc trả 1 tỷ vàng ở NPC Quả trứng trong nhà để nở ngay. Phải đang có đệ, đệ cũ bị thay</td></tr>
+<tr><td><b>Uub, Kid Beerus, Kid Jiren</b></td><td class="n">40 tỷ</td><td>HP/KI gốc 400.000, sức đánh 20.000, 9 ô trang bị, có skill 5, +20% chỉ số khi hợp thể bằng bông tai</td><td>Đệ Mabư đạt 40 tỷ SM, dùng Bình hút năng lượng đã nạp đủ 3.000 Kilis. Ra ngẫu nhiên 1 trong 3</td></tr>
+</tbody></table></div>
+<p><b>Nạp Kilis:</b> Bình hút năng lượng rơi 20% từ Hirudegarn. Mang bình tới Ôsin ở Đại hội võ thuật để vào Sa mạc hoang vu, đánh quái ở đó có cơ hội +1 Kilis mỗi đòn. Bùa của Ôsin (5 ngọc cho 10 phút) tăng cơ hội lên 10 lần.</p>
+
+<h3>Kỹ năng đệ tử</h3>
+<div class="tbl"><table>
+<thead><tr><th>Skill</th><th class="n">Mở khi đệ đạt</th><th>Có thể ra</th></tr></thead>
+<tbody>
+<tr><td>1</td><td class="n">Có sẵn</td><td>Đấm Dragon, Demon hoặc Galick</td></tr>
+<tr><td>2</td><td class="n">150 triệu</td><td>Kamejoko 33%, Masenko 33%, Antomic 34%</td></tr>
+<tr><td>3</td><td class="n">1,5 tỷ</td><td>Thái Dương Hạ San 30%, Tái tạo năng lượng 40%, Kaioken 30%</td></tr>
+<tr><td>4</td><td class="n">20 tỷ</td><td>Biến khỉ 10%, Đẻ trứng 70%, Khiên năng lượng 20%</td></tr>
+<tr><td>5</td><td class="n">40 tỷ</td><td>Chỉ Uub, Kid Beerus, Kid Jiren: Super Kame, Ma phong ba hoặc Liên hoàn chưởng theo hành tinh của đệ</td></tr>
+</tbody></table></div>
+<ul>
+  <li><b>Nâng cấp skill:</b> sách ở Santa, mỗi cuốn +1 cấp, tối đa cấp 7. Skill 1: 100 ngọc, skill 2: 150, skill 3: 200, skill 4: 500.</li>
+  <li><b>Đổi skill:</b> ước Rồng thần 1 sao "Thay chiêu 2-3 đệ tử", hoặc Rồng Băng "Đổi skill 3, 4 đệ tử".</li>
+</ul>
+
+<h3>Điều khiển và chăm đệ</h3>
+<ul>
+  <li>Trạng thái: Đi theo, Bảo vệ, Tấn công, Về nhà, Hợp thể. Đổi trong menu đệ hoặc gõ lệnh chat ở mục <a href="#lenh">Lệnh chat</a>.</li>
+  <li>Sư phụ nhận 50% sức mạnh và tiềm năng mà đệ kiếm được.</li>
+  <li>Đệ chết tự hồi sinh sau 2 phút. Hết KI thì đệ xin đậu thần của sư phụ.</li>
+  <li>Sư phụ đứng yên không đánh quá lâu (30 đến 60 phút) thì đệ ngừng đánh. <b>Bùa Đệ Tử</b> ở Bà Hạt Mít bỏ giới hạn này, đồng thời đệ đánh quái gấp đôi và chỉ nhận một nửa sát thương từ quái.</li>
+  <li>Đệ mặc được đồ khi đạt 1,5 triệu SM: áo, quần, găng, giày, rada, cải trang, giáp luyện tập, đúng hành tinh của đệ. Đệ Uub, Beerus, Jiren mặc thêm được đeo lưng và Sách tuyệt kỹ. Nếu vừa nhận đệ mà chưa mặc được, hãy thoát ra vào lại.</li>
+  <li><b>Đổi đệ tử</b> (100 ngọc ở Santa) cho đệ thường mới, hành tinh xoay vòng Trái Đất, Namếc, Xayda. Dùng khi đang có đệ Mabư hoặc đệ 40 tỷ sẽ mất đệ đó.</li>
+  <li>Đặt tên đệ: mua "Đặt tên đệ tử" 20 ngọc ở Santa rồi chat <code>ten con la Tên</code>.</li>
+</ul>
+</section>
+
+<section>
+<h2 id="hop-the">Hợp thể, bông tai Porata</h2>
+<p>Khi hợp thể, sư phụ cộng 100% HP, KI và sức đánh của đệ.</p>
+<ul>
+  <li><b>Lưỡng long nhất thể:</b> chọn Hợp thể trong menu đệ, không cần bông tai, kéo dài 10 phút.</li>
+  <li><b>Bông tai Porata:</b> hợp thể không giới hạn thời gian, dùng lại bông tai để tách. Cần 1,5 triệu SM. Bông tai cấp 1 bán ở Uron, 1.000 ngọc.</li>
+  <li><b>Hợp thể vĩnh viễn</b> (chỉ sư phụ Namếc): đệ biến mất, sư phụ nhận tiềm năng bằng sức mạnh của đệ.</li>
+</ul>
+<h3>Nâng cấp bông tai ở Bà Hạt Mít (Vách núi, Siêu thị)</h3>
+<div class="tbl"><table>
+<thead><tr><th>Bước</th><th>Nguyên liệu</th><th>Chi phí</th><th class="n">Tỉ lệ</th><th>Thất bại</th></tr></thead>
+<tbody>
+<tr><td>Cấp 1 lên cấp 2</td><td>9.999 Mảnh vỡ bông tai</td><td>200 triệu vàng + 1.000 ngọc</td><td class="n">50%</td><td>Mất 99 mảnh</td></tr>
+<tr><td>Mở chỉ số cấp 2</td><td>200 Mảnh hồn + 1 Đá xanh lam</td><td>1.000 ngọc</td><td class="n">45%</td><td>Mất nguyên liệu</td></tr>
+<tr><td>Cấp 2 lên cấp 3</td><td>20.000 Mảnh vỡ bông tai cấp 3</td><td>200 triệu vàng + 1.000 ngọc</td><td class="n">50%</td><td>Mất 200 mảnh</td></tr>
+<tr><td>Mở chỉ số cấp 3</td><td>99 Mảnh hồn + 1 Đá xanh lam</td><td>1.000 ngọc</td><td class="n">30%</td><td>Mất nguyên liệu</td></tr>
+</tbody></table></div>
+<ul>
+  <li>Bông tai cấp 2 có 1 dòng chỉ số, cấp 3 có 2 dòng. Mỗi dòng 5 đến 15%, ngẫu nhiên trong: HP, KI, sức đánh, hồi HP/KI mỗi 30 giây, giảm sát thương, sức đánh chí mạng. Mở lại sẽ thay dòng cũ.</li>
+  <li>Chỉ số bông tai chỉ có tác dụng khi hợp thể và bông tai nằm trong hành trang.</li>
+  <li><b>Nguồn nguyên liệu:</b> đánh quái ở Tây, Đông, Bắc, Nam thánh địa (cần 40 tỷ SM, đi qua Giu-ma Đầu Bò). Mảnh vỡ rơi 10%, Mảnh hồn 5% (tối đa 150 mỗi ngày), Đá xanh lam rất hiếm. Cỏ bốn lá tăng tỉ lệ. Santa cũng bán Mảnh vỡ 50 ngọc và Đá xanh lam 150 ngọc.</li>
+  <li>Mảnh vỡ bông tai cấp 3 chưa có bãi rơi cố định, theo dõi thông báo sự kiện của admin.</li>
+</ul>
+</section>
+
+<section>
+<h2 id="trang-bi">Trang bị và nâng cấp</h2>
+<h3>Đồ thường, cấp 1 đến 12</h3>
+<p>Mua bằng vàng ở Bunma (Trái Đất), Dende (Namếc), Appule (Xayda) hoặc Siêu thị. Món đắt nhất khoảng 150 triệu vàng. Áo cho giáp, quần cho HP, găng cho sức đánh, giày cho KI, rada cho chí mạng. Shop làng còn bán Giáp tập luyện cấp 1 đến 3.</p>
+
+<h3>Nâng cấp +1 đến +8</h3>
+<p>Ở Bà Hạt Mít tại Vách núi hoặc Siêu thị. Mỗi cấp tăng 10% chỉ số chính. Áp dụng cho mọi bậc đồ, kể cả Thần Linh, Hủy Diệt, Thiên Sứ.</p>
+<div class="tbl"><table>
+<thead><tr><th>Loại đồ</th><th>Đá cần</th></tr></thead>
+<tbody>
+<tr><td>Áo</td><td>Đá Titan</td></tr><tr><td>Quần</td><td>Đá Ruby</td></tr><tr><td>Găng</td><td>Đá thạch anh tím</td></tr><tr><td>Giày</td><td>Đá Saphia</td></tr><tr><td>Rada</td><td>Đá lục bảo</td></tr>
+</tbody></table></div>
+<div class="tbl"><table>
+<thead><tr><th class="n">Lên cấp</th><th class="n">Số đá</th><th class="n">Vàng</th><th class="n">Tỉ lệ</th></tr></thead>
+<tbody>
+<tr><td class="n">+1</td><td class="n">3</td><td class="n">10.000</td><td class="n">80%</td></tr>
+<tr><td class="n">+2</td><td class="n">7</td><td class="n">70.000</td><td class="n">50%</td></tr>
+<tr><td class="n">+3</td><td class="n">11</td><td class="n">300.000</td><td class="n">20%</td></tr>
+<tr><td class="n">+4</td><td class="n">17</td><td class="n">1,5 triệu</td><td class="n">10%</td></tr>
+<tr><td class="n">+5</td><td class="n">23</td><td class="n">7 triệu</td><td class="n">7%</td></tr>
+<tr><td class="n">+6</td><td class="n">35</td><td class="n">23 triệu</td><td class="n">5%</td></tr>
+<tr><td class="n">+7</td><td class="n">50</td><td class="n">100 triệu</td><td class="n">1%</td></tr>
+<tr><td class="n">+8</td><td class="n">70</td><td class="n">250 triệu</td><td class="n">0,3%</td></tr>
+</tbody></table></div>
+<div class="note"><b>Lưu ý.</b> Thất bại khi đồ đang ở +2, +4, +6 sẽ rớt 1 cấp. Đặt thêm 1 Đá bảo vệ để không rớt. Đá bảo vệ có ở Shop bang hội và các gói VIP. Đá nâng cấp rơi 20% ở vùng Cold.</div>
+
+<h3>Pha lê hóa và ép sao</h3>
+<p>Ở Bà Hạt Mít tại Đảo Kamê.</p>
+<ul>
+  <li><b>Pha lê hóa</b> đục lỗ sao, tối đa 9 lỗ. Phí theo số lỗ hiện có: 5, 10, 20, 40, 60, 90, 120, 200, 300 triệu vàng, kèm 1 đến 9 ngọc. Càng nhiều lỗ càng khó, từ lỗ thứ 5 trở đi rất khó. Có nút đập 10 lần và 100 lần liên tục.</li>
+  <li><b>Ép sao</b> gắn Ngọc rồng hoặc Sao pha lê vào lỗ, 10 ngọc, luôn thành công.</li>
+  <li>Lỗ thứ 8 và 9 phải <b>Cường hóa</b> trước khi ép: 1 Hematite + 1 Dùi đục + 500 triệu vàng.</li>
+</ul>
+<div class="tbl"><table>
+<thead><tr><th>Vật ép</th><th>Chỉ số mỗi lần</th></tr></thead>
+<tbody>
+<tr><td>Ngọc rồng 7 sao</td><td>HP +5%</td></tr>
+<tr><td>Ngọc rồng 6 sao</td><td>KI +5%</td></tr>
+<tr><td>Ngọc rồng 5 sao</td><td>Hồi HP +5% mỗi 30 giây</td></tr>
+<tr><td>Ngọc rồng 4 sao</td><td>Hồi KI +5% mỗi 30 giây</td></tr>
+<tr><td>Ngọc rồng 3 sao</td><td>Sức đánh +3%</td></tr>
+<tr><td>Ngọc rồng 2 sao</td><td>Giảm sát thương 2%</td></tr>
+<tr><td>Ngọc rồng 1 sao</td><td>Né đòn 2%</td></tr>
+<tr><td>Sao pha lê</td><td>Hút HP, hút KI, phản sát thương, xuyên giáp, vàng, tiềm năng: +3% hoặc +5%</td></tr>
+</tbody></table></div>
+<ul>
+  <li>Sao pha lê cấp 1 rơi 10% từ mọi quái. Nâng lên cấp 2 cần 1 Hematite, 200 triệu vàng, 10 ngọc, tỉ lệ 50%. Đánh bóng 2 viên cấp 2 với 1 Đá mài thành sao lấp lánh.</li>
+  <li>5 Sao pha lê cấp 1 cùng màu + 50 triệu vàng đổi 1 Hematite. Hematite, Dùi đục, Đá mài cũng bán ở Shop bang hội.</li>
+  <li><b>Nhập ngọc rồng:</b> 7 viên cùng số sao đổi 1 viên ít hơn một sao, miễn phí.</li>
+</ul>
+
+<h3>Chuyển hóa trang bị</h3>
+<p>Ở Bà Hạt Mít Đảo Kamê, 2 tỷ vàng, luôn thành công. Chuyển cấp nâng (+N) và sao pha lê từ đồ cấp 12 đã nâng từ +4 trở lên sang đồ Thần Linh cùng loại, cùng hành tinh, chưa nâng cấp. Dùng để giữ công nâng cấp khi lên Thần Linh.</p>
+</section>
+
+<section>
+<h2 id="skh">Set kích hoạt</h2>
+<p>Set tính trên 5 ô: áo, quần, găng, giày, rada. Phần lớn hiệu ứng cần mặc đủ 5 món cùng set. Mặc đủ 5 món có hào quang.</p>
+<div class="tbl"><table>
+<thead><tr><th>Hành tinh</th><th>Set</th><th>Hiệu ứng</th></tr></thead>
+<tbody>
+<tr><td rowspan="4"><b>Trái Đất</b></td><td>Sôngôku</td><td>5 món: Kamejoko +100% sát thương</td></tr>
+<tr><td>Thiên Xin Hăng</td><td>5 món: Thái Dương Hạ San choáng lâu gấp đôi</td></tr>
+<tr><td>Kirin</td><td>5 món: Quả cầu kênh khi x2 sát thương</td></tr>
+<tr><td>Thần Vũ Trụ Kaio</td><td>4 món: Kaioken chỉ tốn 5% HP. 5 món: tốn 3% HP và +30% sát thương</td></tr>
+<tr><td rowspan="4"><b>Namếc</b></td><td>Ốc Tiêu</td><td>5 món: Liên hoàn +100% sát thương</td></tr>
+<tr><td>Pikkoro Daimao</td><td>5 món: Đẻ trứng x4 sát thương, trứng không hết giờ</td></tr>
+<tr><td>Nail</td><td>2 món: +10% sát thương chí mạng. 4 món: giảm hồi chiêu Masenko. 5 món: giảm hồi chiêu nhiều hơn và Masenko +80%</td></tr>
+<tr><td>Picolo</td><td>Chưa có hiệu ứng ở phiên bản hiện tại</td></tr>
+<tr><td rowspan="4"><b>Xayda</b></td><td>Kakarot</td><td>5 món: Galick +100% sát thương</td></tr>
+<tr><td>Cađíc</td><td>5 món: thời gian biến khỉ x5</td></tr>
+<tr><td>Nappa</td><td>5 món: +80% HP tối đa</td></tr>
+<tr><td>Cađíc M</td><td>2 món: +20% HP. 4 món: Tự sát cộng thêm 20% HP tối đa vào sát thương. 5 món: cộng 50%</td></tr>
+<tr><td><b>Cả 3</b></td><td>Gohan</td><td>Chưa có hiệu ứng ở phiên bản hiện tại</td></tr>
+</tbody></table></div>
+
+<h3>Cách kiếm đồ kích hoạt</h3>
+<ul>
+  <li><b>Săn quái ở 3 map đầu mỗi hành tinh:</b> Đồi hoa cúc, Thung lũng tre, Rừng nấm (Trái Đất); Đồi nấm tím, Thị trấn Moori, Thung lũng Maima (Namếc); Đồi hoang, Làng Plant, Rừng nguyên sinh (Xayda); và Map riêng tư. Tỉ lệ rất thấp, khoảng 2 trên 10.000 mỗi con. Cỏ bốn lá (5 ngọc ở Santa, 30 phút) và chỉ số May mắn trên đồ giúp tăng nhẹ.</li>
+  <li>Đồ rơi là đồ cấp 1 đến 2 của hành tinh mình, không giao dịch được. 30% ra set mới (Thần Vũ Trụ Kaio, Nail, Cađíc M), 70% ra set cũ.</li>
+  <li><b>Capsule Kích hoạt:</b> dùng để chọn loại món (áo, quần, găng, giày, rada) và nhận đồ cấp 1 đến 12 kèm một set ngẫu nhiên của hành tinh mình.</li>
+  <li><b>Tạo Capsule Kích hoạt</b> ở Bà Hạt Mít Đảo Kamê: 3 Khoáng tái chế + 1 Capsule Vỡ + 2 tỷ vàng, luôn thành công. Khoáng tái chế có được khi <b>Phân rã</b> đồ kích hoạt (1 món ra 1 khoáng, 2 tỷ vàng). Capsule Vỡ rơi hiếm ở bãi săn set, hoặc mua 10 Capsule bang ở Shop bang hội.</li>
+  <li>Gói VIP 3 và VIP 4 ở ToriBot tặng sẵn 2 và 5 Capsule Kích hoạt.</li>
+</ul>
+</section>
+
+<section>
+<h2 id="than-linh">Thần Linh, Hủy Diệt, Thiên Sứ</h2>
+<h3>Đồ Thần Linh</h3>
+<p>Áo, quần, găng, giày theo hành tinh và Nhẫn Thần Linh dùng chung. Yêu cầu 14 đến 18 tỷ sức mạnh tùy món. Chỉ số ngẫu nhiên từ 100% đến 115% mức gốc.</p>
+<div class="tbl"><table>
+<thead><tr><th>Nguồn</th><th class="n">Tỉ lệ</th></tr></thead>
+<tbody>
+<tr><td>Boss Baby (Làng Kakarot)</td><td class="n">10%</td></tr>
+<tr><td>Cooler, Cumber, Black Goku, Siêu Bọ Hung</td><td class="n">5%</td></tr>
+<tr><td>Hirudegarn (chỉ rơi áo)</td><td class="n">2,5%</td></tr>
+<tr><td>Boss Mabư 12h</td><td class="n">1%</td></tr>
+<tr><td>Quái vùng Cold</td><td class="n">Rất hiếm</td></tr>
+<tr><td>Hộp thần linh: đổi 99 Phiếu thức ăn ở Bill</td><td class="n">Chắc chắn 1 món</td></tr>
+</tbody></table></div>
+<p><b>Phiếu thức ăn:</b> quái ở mọi map rơi Tayaki, Kẹo táo, Kem que đôi, Mochi, Ramen. Mỗi 99 món cùng loại đổi 1 phiếu ở Bill (Hành tinh Kaio). 99 phiếu đổi 1 Hộp thần linh, mở ra ngẫu nhiên 1 món Thần Linh của bất kỳ hành tinh nào. 9 phiếu đổi 1 Kho báu hải tặc (cải trang hải tặc).</p>
+
+<h3>Đồ Hủy Diệt</h3>
+<ul>
+  <li>Mặc đủ 5 món Thần Linh rồi đánh quái sẽ rơi thức ăn của Bill: Pudding, Xúc xích, Kem dâu, Mì ly, Sushi.</li>
+  <li>Mang 99 phần một loại thức ăn tới Bill ở Hành tinh Kaio, vẫn mặc đủ 5 món Thần Linh, để mua đồ Hủy Diệt.</li>
+  <li>Giá: giày 720 triệu, áo 800 triệu, quần 1 tỷ, găng và nhẫn 2 tỷ vàng. Mỗi món trừ 99 thức ăn.</li>
+  <li>Đồ mua ra được cộng thêm ngẫu nhiên 0 đến 15% chỉ số. Không giao dịch được.</li>
+</ul>
+
+<h3>Đồ Thiên Sứ</h3>
+<p>Chế tạo ở Whis (Hành tinh Bill) khi đang mặc đủ 5 món Hủy Diệt. Yêu cầu 30 tỷ sức mạnh.</p>
+<div class="tbl"><table>
+<thead><tr><th>Nguyên liệu</th><th>Nguồn</th></tr></thead>
+<tbody>
+<tr><td>999 Mảnh thiên sứ (áo, quần, găng, giày hoặc nhẫn, loại mảnh quyết định món ra)</td><td>Quái ở Hành tinh ngục tù rơi 10% khi đang mặc đủ set Hủy Diệt</td></tr>
+<tr><td>1 Công thức hoặc Công thức VIP</td><td>Shop Thiên sứ của Whis: 10 hoặc 20 thỏi vàng</td></tr>
+<tr><td>1 Đá nâng cấp cấp 1 đến 5</td><td>Shop Thiên sứ: 1 đến 5 thỏi vàng. Đá cấp cao cho tỉ lệ thành công cao hơn (91 đến 95%)</td></tr>
+<tr><td>1 Đá may mắn cấp 1 đến 5</td><td>Shop Thiên sứ: 1 đến 5 thỏi vàng. Tăng cơ hội có thêm 1 đến 3 dòng chỉ số phụ</td></tr>
+<tr><td>10 triệu vàng</td><td></td></tr>
+</tbody></table></div>
+<p>Chỉ số gốc: áo 2.800 đến 4.000 giáp, quần 120.000 đến 150.000 HP, găng 10.350 đến 11.500 sức đánh, giày 90.000 đến 130.000 KI, nhẫn 18 đến 20% chí mạng.</p>
+<p>Ở Whis còn <b>học Tuyệt kỹ</b> khi đạt 60 tỷ SM: 9.999 Bí kíp tuyệt kỹ để học, 999 bí kíp mỗi lần nâng cấp, mỗi lần 10 triệu vàng và 99 ngọc. Bí kíp rơi 10% ở Hành tinh ngục tù.</p>
+</section>
+
+<section>
+<h2 id="cai-trang">Cải trang, phụ kiện, bùa</h2>
+<p>Server có hơn 450 cải trang. Cải trang không giao dịch được. Ba số trong bảng là % sức đánh / HP / KI.</p>
+<div class="tbl"><table>
+<thead><tr><th>Cải trang</th><th>Chỉ số</th><th>Cách có</th></tr></thead>
+<tbody>
+<tr><td>Black Goku Rose, Black Goku, Goku SSJ3, SSJ4, SSJ Blue, dòng Cađíc SSJ, Himmel, Hắc Mị Nương, Bunma rực rỡ, Gohan đi biển</td><td>30 / 30 / 30, +30% sát thương chí mạng</td><td>Shop VIP ở Santa, 300 thỏi vàng mỗi món</td></tr>
+<tr><td>Frieren</td><td>23 / 20 / 20, +20% chí mạng, +25% sức đánh cho người xung quanh</td><td>Quy Lão Kame, 999 điểm sự kiện</td></tr>
+<tr><td>Urôn Trư Bát Giới</td><td>26 / 25 / 25, +45% tốc chạy, giảm 15% sát thương</td><td>Quy Lão Kame, 499 điểm sự kiện</td></tr>
+<tr><td>Cải trang VIP</td><td>23 / 20 / 20</td><td>Santa, 10.000 ngọc (cần 150 triệu SM)</td></tr>
+<tr><td>Mabư Còm</td><td>24 / 22 / 22, phản 5% sát thương, +30% TN/SM cho đệ</td><td>Santa, 5.000 ngọc</td></tr>
+<tr><td>Saibamen</td><td>20 / 20 / 20, 50% tự nổ khi chết</td><td>Santa, 3.500 ngọc</td></tr>
+<tr><td>Cải trang Hợp Thể</td><td>21 / 18 / 18, chỉ có tác dụng khi hợp thể</td><td>Santa, 3.000 ngọc (bản 45 ngày 300 ngọc)</td></tr>
+<tr><td>Thỏ đen Android 18, Thỏ đỏ Chi Chi, Thỏ hồng Bunma, Marron</td><td>20 / 20 / 20, +20% tốc chạy</td><td>Shop hạn sử dụng ở Santa, 299 ngọc, 20 đến 30 ngày</td></tr>
+<tr><td>Gohan Bư</td><td>22 / 19 / 19</td><td>Shop hạn sử dụng, 200 triệu vàng, 30 ngày</td></tr>
+<tr><td>Fide vàng</td><td>20 / 20 / 20, hạn 20 ngày</td><td>Rơi chắc chắn từ Fide Vàng và các Death Beam (21h đến 22h)</td></tr>
+<tr><td>Baby, Vegeta Baby, Baby khỉ</td><td>30 đến 40 mỗi chỉ số, hạn 2 đến 5 ngày</td><td>Boss Baby, 1%</td></tr>
+<tr><td>Dr Lychee, Hatchiyack</td><td>22 đến 37 tùy cấp độ phó bản</td><td>Boss cuối Khí gas hủy diệt, mỗi người trong khu đều có phần</td></tr>
+<tr><td>Bunma tóc xanh / nâu / tím, Hit, Mị Nương</td><td>20 đến 25</td><td>Vòng quay may mắn ở Thượng Đế</td></tr>
+<tr><td>Luffy, Zoro và băng hải tặc</td><td>10 đến 15, mạnh hơn khi đứng gần cải trang hải tặc khác</td><td>Kho báu hải tặc: 9 Phiếu thức ăn ở Bill</td></tr>
+<tr><td>Tiểu đội sát thủ, băng Bojack</td><td></td><td>Rơi từ Tiểu đội sát thủ Namếc và băng Bojack</td></tr>
+<tr><td>Cải trang chống lạnh, hút HP, vô hình, +20% vàng, +20% tiềm năng</td><td>Tiện ích</td><td>Santa, 2.000 ngọc (400 ngọc khi có Phiếu giảm giá)</td></tr>
+</tbody></table></div>
+<p><b>Điểm sự kiện</b> có được khi hạ boss (+5 mỗi con) và khi nạp. Đổi ở Quy Lão Kame, mục "Đổi điểm sự kiện".</p>
+
+<h3>Phụ kiện</h3>
+<ul>
+  <li><b>Linh thú đi theo:</b> +15% sức đánh, HP, KI, 150 thỏi vàng ở Shop VIP (Godzilla, Kong, Shiba, Zịt vàng). Bản +10% giá 50 Capsule bang ở Shop bang hội. Linh thú chỉ cộng chỉ số, không chiến đấu.</li>
+  <li><b>Thú cưỡi, ván bay:</b> +5% ở Shop VIP 50 thỏi vàng, +10% ở Shop bang hội 50 Capsule bang.</li>
+  <li><b>Đeo lưng:</b> +10%, 100 thỏi vàng ở Shop VIP.</li>
+  <li><b>Danh hiệu:</b> mục Danh hiệu ở Santa, mở khóa bằng nhiệm vụ huy hiệu. Ví dụ "Thánh đập đồ +7" cho +10% HP và KI.</li>
+  <li><b>Sách sưu tập thẻ:</b> 21 thẻ quái và boss, mỗi thẻ nâng tối đa cấp 2 để cộng chỉ số.</li>
+</ul>
+
+<h3>Bùa ở Bà Hạt Mít (Vách núi, Siêu thị)</h3>
+<div class="tbl"><table>
+<thead><tr><th>Bùa</th><th>Tác dụng</th><th class="n">1 giờ</th><th class="n">8 giờ</th><th class="n">1 tháng</th></tr></thead>
+<tbody>
+<tr><td>Trí Tuệ</td><td>x2 tiềm năng (có bản x3 và x4 đắt hơn)</td><td class="n">5</td><td class="n">20</td><td class="n">500</td></tr>
+<tr><td>Mạnh Mẽ</td><td>+150% sát thương</td><td class="n">5</td><td class="n">20</td><td class="n">500</td></tr>
+<tr><td>Da Trâu</td><td>Quái đánh chỉ còn một nửa sát thương</td><td class="n">3</td><td class="n">10</td><td class="n">250</td></tr>
+<tr><td>Oai Hùng</td><td>Quái thủ lĩnh không gây đòn trừ 10% HP</td><td class="n">7</td><td class="n">28</td><td class="n">700</td></tr>
+<tr><td>Bất Tử</td><td>Không bị quái giết</td><td class="n">7</td><td class="n">28</td><td class="n">700</td></tr>
+<tr><td>Dẻo Dai</td><td>Không mất thể lực</td><td class="n">1</td><td class="n">4</td><td class="n">100</td></tr>
+<tr><td>Thu Hút</td><td>Tự hút vật phẩm rơi</td><td class="n">2</td><td class="n">10</td><td class="n">250</td></tr>
+<tr><td>Đệ Tử</td><td>Đệ đánh quái x2, nhận nửa sát thương, không ngừng đánh</td><td class="n">10</td><td class="n">60</td><td class="n">1.500</td></tr>
+</tbody></table></div>
+<p>Giá tính bằng ngọc.</p>
+</section>
+
+<section>
+<h2 id="boss">Boss</h2>
+<p>Boss xuất hiện từ khu 2 trở lên. Hầu hết boss cho +5 điểm sự kiện, 20.000 đến 30.000 vàng và 80% rơi Ngọc rồng 5 đến 7 sao.</p>
+<div class="tbl"><table>
+<thead><tr><th>Boss</th><th>Bản đồ</th><th class="n">HP</th><th class="n">Hồi sinh</th><th>Phần thưởng nổi bật</th></tr></thead>
+<tbody>
+<tr><td>Broly, Super Broly</td><td>Đảo Kamê, Đảo Guru, Vách núi đen, Rừng Bamboo đến Bờ vực đen</td><td class="n">Tới 16 triệu</td><td class="n">10 phút</td><td>Đệ tử (nếu chưa có)</td></tr>
+<tr><td>Kuku / Mập Đầu Đinh / Rambo</td><td>Vùng Nappa và Fide</td><td class="n">0,5 / 1 / 1,5 triệu</td><td class="n">10 phút</td><td>Gói thưởng chuẩn</td></tr>
+<tr><td>Tiểu đội sát thủ (5 con)</td><td>Núi khỉ đỏ, Hang quỷ chim, Núi khỉ đen, Hang khỉ đen</td><td class="n">25 đến 50 triệu</td><td class="n">5 phút</td><td>Gói thưởng chuẩn</td></tr>
+<tr><td>Tiểu đội sát thủ Namếc</td><td>Làng Mori đến Đảo Guru</td><td class="n">2,5 đến 5 triệu</td><td class="n">5 phút</td><td>Ngọc, cải trang tiểu đội, Ngọc rồng 6 và 7 sao</td></tr>
+<tr><td>Fide đại ca 1, 2, 3</td><td>Núi khỉ vàng</td><td class="n">10 / 20 / 30 triệu</td><td class="n">10 phút</td><td>Gói thưởng chuẩn</td></tr>
+<tr><td>Dr.Kôrê, Android 19</td><td>Cao nguyên, Đảo Balê, Thành phố phía nam</td><td class="n">1 đến 2 triệu</td><td class="n">10 phút</td><td>Gói thưởng chuẩn</td></tr>
+<tr><td>Android 13, 14, 15</td><td>Sân sau siêu thị</td><td class="n">3 đến 5 triệu</td><td class="n">10 phút</td><td>Gói thưởng chuẩn</td></tr>
+<tr><td>King Kong, Píc, Póc</td><td>Thành phố, Ngọn núi, Thung lũng phía bắc</td><td class="n">10 đến 20 triệu</td><td class="n">10 phút</td><td>Gói thưởng chuẩn</td></tr>
+<tr><td>Xên bọ hung (3 dạng)</td><td>Thị trấn Ginder</td><td class="n">50 đến 150 triệu</td><td class="n">30 phút</td><td>Gói thưởng chuẩn</td></tr>
+<tr><td>Siêu Bọ Hung + 7 Xên con</td><td>Võ đài Xên bọ hung</td><td class="n">150 đến 200 triệu</td><td class="n">30 phút</td><td>5% Thần Linh, 30% đồ cấp cao có sao, Ngọc rồng 2 đến 7 sao</td></tr>
+<tr><td>Black Goku, Super Black Goku</td><td>Các thành phố tương lai</td><td class="n">0,5 đến 2 tỷ</td><td class="n">5 phút</td><td>5% Thần Linh, đồ cấp cao, Nhẫn thời không sai lệch</td></tr>
+<tr><td>Cumber, Super Cumber</td><td>Hành tinh ngục tù</td><td class="n">0,5 đến 2 tỷ</td><td class="n">5 phút</td><td>5% Thần Linh, đồ cấp cao</td></tr>
+<tr><td>Cooler, Cooler 2</td><td>Hang băng (Cold)</td><td class="n">200 đến 500 triệu</td><td class="n">30 phút</td><td>5% Thần Linh, Ngọc rồng 2 đến 7 sao</td></tr>
+<tr><td>Baby (3 dạng)</td><td>Làng Kakarot</td><td class="n">2 tỷ mỗi dạng</td><td class="n">15 phút</td><td>10% Thần Linh, 1% cải trang Baby</td></tr>
+<tr><td>Fide Vàng</td><td>Đông Karin, chỉ 21h đến 22h</td><td class="n">1 tỷ</td><td class="n">5 phút</td><td>Cải trang Fide vàng, rơi cả từ 5 Death Beam</td></tr>
+<tr><td>Bojack, Bujin, Kogu, Zangya, Bido</td><td>Rừng nấm đến Đảo Bulông (Trái Đất)</td><td class="n">20 đến 150 triệu</td><td class="n">15 phút</td><td>Nhiều ngọc, cải trang băng Bojack, Ngọc rồng 6 và 7 sao</td></tr>
+<tr><td>Siêu Bojack</td><td>Như trên</td><td class="n">500 triệu</td><td class="n">30 phút</td><td>Ngọc, cải trang Siêu Bojack</td></tr>
+<tr><td>Hirudegarn</td><td>Thành phố Santa</td><td class="n">40 triệu</td><td class="n"></td><td>20% trứng Mabư, 20% Bình hút năng lượng, áo Thần Linh</td></tr>
+<tr><td>Chiến binh Yardrat</td><td>Hành tinh Yardrat</td><td class="n">0,35 đến 1 triệu</td><td class="n">Liên tục</td><td>Bí kiếp (20 đến 50%)</td></tr>
+<tr><td>Thủy Tinh, Sơn Tinh (sự kiện)</td><td>Các map thường</td><td class="n">50 triệu</td><td class="n">15 phút</td><td>Cải trang +15 đến 20% có hạn</td></tr>
+<tr><td>Sói hẹc quyn, Ở Dơ, Ăn trộm</td><td>Các map thường</td><td class="n">Thấp</td><td class="n">10 phút</td><td>Hộp quà Goku Day. Ăn trộm trả lại 80% vàng đã trộm</td></tr>
+<tr><td>Mặt Trời</td><td>Đảo Kamê và 3 làng</td><td class="n">100</td><td class="n">10 phút</td><td>50% Mặt trời tí hon (+7 đến 10%, có hạn)</td></tr>
+</tbody></table></div>
+<p><b>Đồ cấp cao</b> là đồ cấp 9 đến 11 có sẵn 1 đến 6 lỗ sao. Khi boss rơi Thần Linh, cơ hội từng món: giày nhiều nhất, sau đó áo, quần, găng, nhẫn hiếm nhất.</p>
+</section>
+
+<section>
+<h2 id="pho-ban">Phó bản bang hội</h2>
+<div class="tbl"><table>
+<thead><tr><th>Phó bản</th><th>NPC</th><th>Điều kiện</th><th>Phần thưởng</th></tr></thead>
+<tbody>
+<tr><td><b>Doanh trại Độc Nhãn</b><br>30 phút</td><td>Lính canh, Rừng Bamboo</td><td>Bang từ 5 thành viên, vào bang từ 1 ngày, có đồng đội cùng bang đứng gần. Mỗi bang 1 lần mỗi ngày, miễn phí</td><td>5 boss, mỗi con rơi Cậu Vàng, Ngọc rồng 4 sao, Bản đồ kho báu. Diệt hết rồi nói chuyện Độc Nhãn để có 5 phút nhặt ngọc rồng</td></tr>
+<tr><td><b>Bản đồ kho báu</b><br>30 phút, cấp 1 đến 110</td><td>Quy Lão Kame, Đảo Kamê</td><td>Có bang, 2 tỷ SM, tốn 1 Bản đồ kho báu. Mỗi người 3 lần mỗi ngày</td><td>Boss Trung úy Xanh Lơ rơi Bí ngô 4 sao. Tiềm năng trong phó bản x1,5. Có bảng xếp hạng bang</td></tr>
+<tr><td><b>Khí gas hủy diệt</b><br>30 phút, cấp 1 đến 110</td><td>Mr.PôPô, Làng Aru</td><td>Bang chủ mở, vào bang từ 2 ngày. Mỗi bang 3 lần mỗi ngày</td><td>Dr.Lychee rồi Hatchiyack. Mỗi người trong khu nhận cải trang, cấp càng cao chỉ số càng cao</td></tr>
+<tr><td><b>Con đường rắn độc</b><br>30 phút, cấp 1 đến 110</td><td>Thần Vũ Trụ, Hành tinh Kaio</td><td>Có bang, vào bang từ 2 ngày. Mỗi người 1 lần mỗi 7 ngày</td><td>Saibamen và Nađíc rơi Ngọc rồng 6 sao. Cađích rơi Phiếu giảm giá và Bí ngô 5 sao</td></tr>
+</tbody></table></div>
+<h3>Lãnh địa bang</h3>
+<ul>
+  <li><b>Gấu Tướng Cướp:</b> bang chủ gọi ở Giu-ma Đầu Bò khi có từ 3 thành viên trong khu. Boss 2 tỷ HP, hạ xong chia 50 Capsule bang theo sát thương.</li>
+  <li><b>Điểm danh bang:</b> +1 Capsule bang mỗi ngày ở Giu-ma Đầu Bò.</li>
+  <li><b>Nhiệm vụ Bang:</b> nhận ở Dr.Brief trong Lãnh địa bang, 5 nhiệm vụ mỗi ngày, thưởng 10 đến 50 Capsule bang. Người chưa có bang vẫn nhận và làm được, nhưng Capsule bang chỉ được cộng khi đang ở trong bang.</li>
+  <li><b>Shop bang</b> (trả bằng Capsule bang): linh thú và thú cưỡi +10%, Đá bảo vệ, Cỏ bốn lá, Capsule Vỡ, Hematite, Dùi đục, Đá mài, mảnh thẻ sưu tập.</li>
+</ul>
+</section>
+
+<section>
+<h2 id="lich">Lịch hoạt động trong ngày</h2>
+<div class="tbl"><table>
+<thead><tr><th>Giờ</th><th>Hoạt động</th><th>Ở đâu</th><th>Ghi chú</th></tr></thead>
+<tbody>
+<tr><td>Cả ngày</td><td>Đại hội võ thuật lần 23</td><td>Ghi danh, Đại hội võ thuật</td><td>12 vòng đấu máy, thưởng Rương gỗ theo số vòng qua, nhận 1 lần mỗi ngày</td></tr>
+<tr><td>8h đến 22h</td><td>Gọi Rồng thần Namếc</td><td>Dende, Làng Mori</td><td>Cả bang giữ đủ 7 viên</td></tr>
+<tr><td>8h, 14h, 18h</td><td>Đại hội võ thuật Nhi đồng</td><td>Ghi danh</td><td>Dưới 1,5 triệu SM, phí 2 ngọc</td></tr>
+<tr><td>9h, 13h, 19h</td><td>Siêu cấp 1</td><td>Ghi danh</td><td>1,5 đến 15 triệu SM, 4 ngọc</td></tr>
+<tr><td>10h, 15h, 20h</td><td>Siêu cấp 2</td><td>Ghi danh</td><td>15 đến 150 triệu SM, 6 ngọc</td></tr>
+<tr><td>11h, 16h, 21h</td><td>Siêu cấp 3</td><td>Ghi danh</td><td>150 triệu đến 1,5 tỷ SM, 8 ngọc</td></tr>
+<tr><td>12h, 17h, 22h, 23h</td><td>Ngoại hạng</td><td>Ghi danh</td><td>Không giới hạn, 10.000 vàng. Vô địch: 50 ngọc và đá nâng cấp</td></tr>
+<tr><td><b>12h đến 13h</b></td><td><b>Mabư 12h</b></td><td>Ôsin, Đại hội võ thuật</td><td>6 tầng, cần 10 điểm để xuống tầng. Boss có 1% Thần Linh</td></tr>
+<tr><td><b>14h đến 15h</b></td><td><b>Mabư 14h</b></td><td>Ôsin, Đại hội võ thuật</td><td>Tối đa 5 người mỗi khu. Phù hộ 10 ngọc: +1 triệu HP, KI và +10.000 sức đánh</td></tr>
+<tr><td><b>20h đến 21h</b></td><td><b>Ngọc rồng sao đen</b></td><td>Rồng Omega, Trạm tàu vũ trụ</td><td>Nhặt ngọc từ 20h30, giữ 5 phút là thắng. Cả bang nhận buff 22 giờ</td></tr>
+<tr><td><b>21h đến 22h</b></td><td><b>Fide Vàng</b></td><td>Đông Karin</td><td>Cải trang Fide vàng</td></tr>
+</tbody></table></div>
+<p>Đại hội võ thuật theo giờ: đăng ký trước phút 25, thi đấu từ phút 30.</p>
+<h3>Buff Ngọc rồng sao đen</h3>
+<div class="tbl"><table>
+<thead><tr><th class="n">Sao</th><th>Buff cho cả bang</th></tr></thead>
+<tbody>
+<tr><td class="n">1</td><td>+21% sức đánh</td></tr><tr><td class="n">2</td><td>+35% HP</td></tr><tr><td class="n">3</td><td>+35% hút HP</td></tr><tr><td class="n">4</td><td>+35% phản sát thương</td></tr><tr><td class="n">5</td><td>+35% sát thương chí mạng</td></tr><tr><td class="n">6</td><td>+40% KI</td></tr><tr><td class="n">7</td><td>+14% né đòn</td></tr>
+</tbody></table></div>
+<h3>Việc hằng ngày</h3>
+<ul>
+  <li>Điểm danh Bò Mộng: 10.000 ngọc + 100 thỏi vàng.</li>
+  <li>Nhiệm vụ hằng ngày ở Bò Mộng: 10 nhiệm vụ, chọn Dễ, Bình thường hoặc Khó. Thưởng 5.000 đến 50.000 vàng và Bí ngô 7, 6 hoặc 5 sao.</li>
+  <li>Bùa 1 giờ miễn phí ở Bà Hạt Mít.</li>
+  <li>Siêu thần thủy: dùng "Mảnh giấy có chữ MA" để vào Tây Karin, diệt quái và PôCôLô trong 15 phút, rồi gặp Karin nhận thuốc. Mỗi ngày 1 lần.</li>
+  <li>Giải Siêu hạng (Trọng tài): nhận ngọc mỗi ngày theo hạng, Top 1 được 100 ngọc.</li>
+  <li>Thành tựu ở Bò Mộng: 20 mục, thưởng từ 10 đến 50.000 ngọc.</li>
+</ul>
+</section>
+
+<section>
+<h2 id="rong-than">Rồng thần</h2>
+<h3>Rồng thần Trái Đất</h3>
+<p>Gọi ở Làng Aru, Làng Mori hoặc Làng Kakarot bằng viên 1, 2 hoặc 3 sao kèm đủ các viên sao thấp hơn tới 7 sao. Ngọc rồng 4 đến 7 sao rơi từ quái và boss, nhập 7 viên thành 1 viên cao hơn ở Bà Hạt Mít.</p>
+<div class="tbl"><table>
+<thead><tr><th>Rồng</th><th>Điều ước</th></tr></thead>
+<tbody>
+<tr><td><b>1 sao</b></td><td>Đặt số vàng thành 2 tỷ · Găng đang đeo +1 cấp (tối đa +7) · Chí mạng gốc +2% (khi đang dưới 9%) · Thay chiêu 2 và 3 của đệ tử · Avatar VIP · +10.000 ngọc · +200 triệu sức mạnh và tiềm năng · Găng đệ tử +1 cấp</td></tr>
+<tr><td><b>2 sao</b></td><td>+2.000 ngọc · +20 triệu sức mạnh và tiềm năng · +200 triệu vàng</td></tr>
+<tr><td><b>3 sao</b></td><td>+200 ngọc · +2 triệu sức mạnh và tiềm năng · +20 triệu vàng</td></tr>
+</tbody></table></div>
+<div class="note"><b>Lưu ý.</b> Điều ước giàu có của rồng 1 sao đặt vàng về đúng 2 tỷ chứ không cộng thêm. Đang có nhiều hơn 2 tỷ vàng thì đừng chọn.</div>
+<h3>Rồng thần Namếc</h3>
+<p>7 viên rải ở các map Namếc. Gọi ở Làng Mori khi cả 7 viên do người cùng bang giữ, đứng chung khu, từ 8h đến 22h. Điều ước cho cả bang, chọn 1: Ngọc rồng 3 sao cho mỗi người, hoặc linh thú Hổ mập vàng. Sau khi gọi, ngọc hóa đá khoảng 24 giờ.</p>
+<h3>Rồng Băng</h3>
+<p>Đủ 7 viên ngọc rồng băng, gọi ở bất kỳ map nào ngoài 3 làng. Điều ước: đổi chiêu 3 và 4 của đệ tử, đổi nội tại (cần 10 tỷ SM), cải trang Siêu Thần hoặc Black Gohan Rose hạn 90 ngày.</p>
+</section>
+
+<section>
+<h2 id="kinh-te">Vàng, ngọc, thỏi vàng</h2>
+<div class="tbl"><table>
+<thead><tr><th>Tiền</th><th>Kiếm ở đâu</th><th>Dùng làm gì</th></tr></thead>
+<tbody>
+<tr><td><b>Vàng</b><br>tối đa 200 tỷ</td><td>Quái, nhiệm vụ, boss, bán thỏi vàng (37 triệu mỗi thỏi), bán đồ cho shop</td><td>Đồ shop, nâng cấp, pha lê hóa, mở giới hạn, nội tại, đồ Hủy Diệt</td></tr>
+<tr><td><b>Ngọc</b></td><td>10.000 lúc tạo nhân vật, điểm danh 10.000 mỗi ngày, thành tựu, rồng thần, nạp</td><td>Sách kỹ năng, bùa, cải trang, shop Santa và Uron, bông tai</td></tr>
+<tr><td><b>Thỏi vàng</b></td><td>Điểm danh 100 mỗi ngày, giftcode, gói VIP, bán đồ ở ký gửi</td><td>Shop VIP, Shop Thiên sứ, phí ký gửi, bán lấy vàng</td></tr>
+<tr><td><b>Điểm sự kiện</b></td><td>Hạ boss (+5), nạp (50 điểm mỗi 10.000đ)</td><td>Đổi cải trang, linh thú, hộp quà ở Quy Lão Kame</td></tr>
+<tr><td><b>Capsule bang</b></td><td>Nhiệm vụ bang, điểm danh bang, Gấu Tướng Cướp</td><td>Shop bang hội, nâng cấp bang</td></tr>
+</tbody></table></div>
+
+<h3>Nạp</h3>
+<ul>
+  <li>Nạp số dư trên web cat.io.vn bằng thẻ cào hoặc chuyển khoản.</li>
+  <li>Trong game, tới Bò Mộng chọn <b>Nạp Ngọc</b>: 1đ = 1 ngọc, mỗi lần từ 10.000đ đến 5.000.000đ. Mỗi 10.000đ kèm 10 Vé tặng ngọc và 50 điểm sự kiện.</li>
+  <li><b>Gói VIP ở ToriBot</b> (làng): trừ thẳng vào số dư.</li>
+</ul>
+<div class="tbl"><table>
+<thead><tr><th>Gói</th><th class="n">Giá</th><th>Quà chính</th></tr></thead>
+<tbody>
+<tr><td>VIP 1</td><td class="n">50.000đ</td><td>200 thỏi vàng, 10 phiếu giảm giá, thú cưỡi và linh thú 30 ngày, 5 đá bảo vệ</td></tr>
+<tr><td>VIP 2</td><td class="n">100.000đ</td><td>500 thỏi vàng, 10 đá bảo vệ, cải trang</td></tr>
+<tr><td>VIP 3</td><td class="n">150.000đ</td><td>700 thỏi vàng, 30 đá bảo vệ, đồ vĩnh viễn, 2 Capsule Kích hoạt</td></tr>
+<tr><td>VIP 4</td><td class="n">200.000đ</td><td>1.000 thỏi vàng, cải trang Hắc Mị Nương, 5 Capsule Kích hoạt, trứng Mabư</td></tr>
+</tbody></table></div>
+<p>Mọi gói VIP cho 30 ngày tăng tiềm năng và tặng đệ tử nếu chưa có.</p>
+
+<h3>Giao dịch và ký gửi</h3>
+<ul>
+  <li><b>Giao dịch:</b> tối đa 10 triệu vàng mỗi lần, cách nhau 10 giây. Không giao dịch được cải trang, bông tai, bùa, đậu thần, sách, giáp luyện tập và đồ ghi "không thể giao dịch".</li>
+  <li><b>Ký gửi</b> ở Siêu thị: phí đăng 1 thỏi vàng, thuế 10% khi bán được. Đẩy lên trang đầu 2 thỏi vàng. Người mua cần từ 17 tỷ sức mạnh.</li>
+  <li><b>Tặng ngọc:</b> dùng Vé tặng ngọc rồi nhập tên người nhận, phí 10%.</li>
+  <li>Tài khoản chưa kích hoạt không giao dịch, ký gửi, thách đấu hay vào phó bản bang được. Nếu gặp thông báo này hãy liên hệ admin.</li>
+</ul>
+
+<h3>Vật phẩm hỗ trợ</h3>
+<ul>
+  <li><b>Cuồng nộ</b> (sức đánh x2), <b>Bổ huyết</b> (+100% HP), <b>Bổ khí</b> (+100% KI), <b>Giáp Xên</b> (giảm 50% sát thương), <b>Ẩn danh</b>: mỗi món 10 phút. Có từ giftcode và Capsule kì bí.</li>
+  <li><b>Cỏ bốn lá:</b> 30 phút tăng tỉ lệ rơi đồ hiếm, 5 ngọc ở Santa.</li>
+  <li><b>Máy dò Capsule kì bí:</b> 5 triệu vàng ở Bunma tương lai, 30 phút.</li>
+  <li><b>Đậu thần:</b> trồng ở nhà, hoặc mua gói ở Uron 10 ngọc.</li>
+  <li><b>Tự động luyện tập:</b> 2 ngọc ở shop làng.</li>
+</ul>
+</section>
+
+<section>
+<h2 id="lenh">Lệnh chat và mẹo</h2>
+<div class="tbl"><table>
+<thead><tr><th>Gõ vào khung chat</th><th>Tác dụng</th></tr></thead>
+<tbody>
+<tr><td><code>di theo</code></td><td>Đệ đi theo</td></tr>
+<tr><td><code>bao ve</code></td><td>Đệ bảo vệ sư phụ</td></tr>
+<tr><td><code>tan cong</code></td><td>Đệ tự tấn công</td></tr>
+<tr><td><code>ve nha</code></td><td>Đệ về nhà</td></tr>
+<tr><td><code>bien hinh</code></td><td>Đệ Mabư hoặc Jiren biến hình</td></tr>
+<tr><td><code>ten con la Tên</code></td><td>Đổi tên đệ (cần vật phẩm Đặt tên đệ tử)</td></tr>
+<tr><td><code>sach tuyet ky</code></td><td>Trang bị Sách tuyệt kỹ cho đệ Uub, Beerus, Jiren</td></tr>
+</tbody></table></div>
+<h3>Lộ trình gợi ý</h3>
+<ol class="steps">
+  <li><b>Dưới 1,5 triệu SM:</b> làm nhiệm vụ chính tới Bái sư, nhập giftcode, điểm danh, săn Super Broly lấy đệ.</li>
+  <li><b>Tới 2 tỷ SM:</b> mua đồ cấp cao ở shop bằng vàng từ thỏi vàng, treo Bùa Trí Tuệ, nâng skill đệ, xong nhiệm vụ Fide để mở tương lai.</li>
+  <li><b>Tới 18 tỷ SM:</b> săn boss tương lai và Cold lấy Thần Linh, đổi Phiếu thức ăn lấy Hộp thần linh, mở giới hạn sức mạnh.</li>
+  <li><b>Tới 40 tỷ SM:</b> đủ set Thần Linh, gom thức ăn đổi đồ Hủy Diệt, vào thánh địa nâng bông tai Porata, nuôi Mabư lên 40 tỷ.</li>
+  <li><b>Từ 60 tỷ SM:</b> học Tuyệt kỹ, chế tạo đồ Thiên Sứ, đổi đệ 40 tỷ.</li>
+</ol>
+</section>
+
+<footer>Số liệu lấy từ cấu hình server ngày 01/10/2026. Admin có thể điều chỉnh tỉ lệ, giá và sự kiện, hãy theo dõi thông báo trên diễn đàn cat.io.vn.</footer>
+</main>
+</div>
+
+<script>
+(function () {
+  var toc = document.getElementById('toc');
+  var narrow = window.matchMedia('(max-width: 860px)');
+  function fit() { toc.open = !narrow.matches; }
+  fit();
+  if (narrow.addEventListener) narrow.addEventListener('change', fit);
+  var links = Array.prototype.slice.call(toc.querySelectorAll('a'));
+  var map = {};
+  links.forEach(function (a) {
+    map[a.getAttribute('href').slice(1)] = a;
+    a.addEventListener('click', function () { if (narrow.matches) toc.open = false; });
+  });
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      links.forEach(function (a) { a.classList.remove('on'); });
+      var a = map[e.target.id];
+      if (a) a.classList.add('on');
+    });
+  }, { rootMargin: '0px 0px -70% 0px' });
+  document.querySelectorAll('h2[id]').forEach(function (h) { io.observe(h); });
+})();
+</script>
+</body></html>
