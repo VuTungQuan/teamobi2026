@@ -4,28 +4,11 @@ include_once '_cms.php';
 $msg = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $player_name = trim($_POST['player_name'] ?? '');
-    $st = $conn->prepare("SELECT id, items_bag, data_point FROM player WHERE name = ? LIMIT 1");
+    $st = $conn->prepare("SELECT id, items_bag FROM player WHERE name = ? LIMIT 1");
     $st->bind_param("s", $player_name); $st->execute();
     $p = $st->get_result()->fetch_assoc();
     if (!$p) {
         flash('Tên nhân vật không tồn tại.', 'danger');
-    } elseif (($_POST['action'] ?? '') === 'point') {
-        $sucmanh = max(0, (int)($_POST['sucmanh'] ?? 0));
-        $tiemnang = max(0, (int)($_POST['tiemnang'] ?? 0));
-        // data_point: [limitPower, power, tiemNang, ...] theo thứ tự server game đọc.
-        $dp = json_decode($p['data_point'], true);
-        if (!is_array($dp) || count($dp) < 3) {
-            flash('data_point của nhân vật không hợp lệ.', 'danger');
-        } elseif ($sucmanh + $tiemnang <= 0) {
-            flash('Nhập sức mạnh hoặc tiềm năng lớn hơn 0.', 'danger');
-        } else {
-            $dp[1] += $sucmanh;
-            $dp[2] += $tiemnang;
-            $json = json_encode($dp);
-            $st = $conn->prepare("UPDATE player SET data_point = ? WHERE id = ?");
-            $st->bind_param("si", $json, $p['id']); $st->execute();
-            flash("Đã cộng " . number_format($sucmanh) . " sức mạnh, " . number_format($tiemnang) . " tiềm năng cho $player_name.");
-        }
     } else {
         $id = (int)($_POST['id'] ?? 0);
         $soluong = (int)($_POST['soluong'] ?? 0);
@@ -55,6 +38,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $items = $conn->query("SELECT id, NAME FROM item_template WHERE NAME <> '' ORDER BY id")->fetch_all(MYSQLI_ASSOC);
 $options = $conn->query("SELECT id, NAME FROM item_option_template WHERE NAME <> '' ORDER BY id")->fetch_all(MYSQLI_ASSOC);
 
+// Các chỉ số tiềm năng / sức mạnh có tham số, ghim lên đầu danh sách cho dễ chọn.
+$tnsm = array_filter($options, fn($o) => strpos($o['NAME'], '#') !== false && preg_match('/tiềm năng|\bTN\b/iu', $o['NAME']));
+
 cms_header('Buff vật phẩm');
 ?>
 <div class="row"><div class="col-lg-6">
@@ -72,25 +58,18 @@ cms_header('Buff vật phẩm');
       <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addOpt()">+ Thêm chỉ số</button>
     </div>
     <template id="optTpl"><div class="form-row mb-2">
-      <div class="col-7"><select class="form-control" name="option[]"><?php foreach ($options as $o): ?><option value="<?= $o['id'] ?>"><?= $o['id'] ?> - <?= h($o['NAME']) ?></option><?php endforeach; ?></select></div>
+      <div class="col-7"><select class="form-control" name="option[]">
+        <optgroup label="Tiềm năng, sức mạnh"><?php foreach ($tnsm as $o): ?><option value="<?= $o['id'] ?>"><?= $o['id'] ?> - <?= h($o['NAME']) ?></option><?php endforeach; ?></optgroup>
+        <optgroup label="Tất cả chỉ số"><?php foreach ($options as $o): ?><option value="<?= $o['id'] ?>"><?= $o['id'] ?> - <?= h($o['NAME']) ?></option><?php endforeach; ?></optgroup></select></div>
       <div class="col-4"><input class="form-control" name="param[]" type="number" value="10" title="Giá trị chỉ số (VD: 10 = 10%)" required></div>
       <div class="col-1"><button type="button" class="btn btn-outline-danger" onclick="this.closest('.form-row').remove()">&times;</button></div>
     </div></template>
     <button class="btn btn-main">Buff</button>
   </form>
 </div></div>
-<div class="card shadow-sm mt-3"><div class="card-body">
-  <h6>Buff sức mạnh / tiềm năng</h6>
-  <form method="post"><?= csrf_field() ?><input type="hidden" name="action" value="point">
-    <div class="form-group"><label>Tên nhân vật</label><input class="form-control" name="player_name" required></div>
-    <div class="form-group"><label>Sức mạnh cộng thêm</label><input class="form-control" name="sucmanh" type="number" min="0" value="0"></div>
-    <div class="form-group"><label>Tiềm năng cộng thêm</label><input class="form-control" name="tiemnang" type="number" min="0" value="0"></div>
-    <button class="btn btn-main">Cộng</button>
-  </form>
-</div></div>
 </div>
 <div class="col-lg-6"><div class="alert alert-warning">
-  <b>Lưu ý</b><br>- Người chơi phải thoát game trước khi buff, nếu không server sẽ ghi đè hành trang / chỉ số.<br>- Chỉ dùng chỉ số thực sự có, chọn sai gây lỗi vật phẩm.<br>- Ví dụ: Thỏi vàng là ID 457.
+  <b>Lưu ý</b><br>- Người chơi phải thoát game trước khi buff, nếu không server sẽ ghi đè hành trang.<br>- Chỉ dùng chỉ số thực sự có, chọn sai gây lỗi vật phẩm.<br>- Ví dụ: Thỏi vàng là ID 457.
 </div></div></div>
 <script>
 function addOpt() { document.getElementById('optRows').appendChild(document.getElementById('optTpl').content.cloneNode(true)); }
