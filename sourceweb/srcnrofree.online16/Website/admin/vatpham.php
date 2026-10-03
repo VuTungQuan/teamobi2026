@@ -4,29 +4,49 @@ include_once '_cms.php';
 $msg = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $player_name = trim($_POST['player_name'] ?? '');
-    $id = (int)($_POST['id'] ?? 0);
-    $soluong = (int)($_POST['soluong'] ?? 0);
-    $has_option = ($_POST['option_type'] ?? '') === 'has_option';
-    $option = $has_option ? (int)$_POST['option'] : 73;
-    $param = $has_option ? (int)$_POST['param'] : 1;
-
-    $st = $conn->prepare("SELECT id, items_bag FROM player WHERE name = ? LIMIT 1");
+    $st = $conn->prepare("SELECT id, items_bag, data_point FROM player WHERE name = ? LIMIT 1");
     $st->bind_param("s", $player_name); $st->execute();
     $p = $st->get_result()->fetch_assoc();
     if (!$p) {
         flash('Tên nhân vật không tồn tại.', 'danger');
-    } elseif ($id <= 0 || $soluong <= 0) {
-        flash('ID vật phẩm và số lượng phải lớn hơn 0.', 'danger');
-    } else {
-        // Ghi vào ô trống đầu tiên trong items_bag. Định dạng chuỗi giữ nguyên theo game server.
-        $replacement = "[$id, $soluong,\\\"[\\\\\\\\\\\"[$option,$param]\\\\\\\\\\\"]\\\"";
-        $bag = preg_replace('/\[-1,0,\\\"\[\]\\\"/', $replacement, $p['items_bag'], 1, $count);
-        if ($count === 0 || empty($bag)) {
-            flash('Hành trang đầy hoặc không tìm thấy ô trống.', 'danger');
+    } elseif (($_POST['action'] ?? '') === 'point') {
+        $sucmanh = max(0, (int)($_POST['sucmanh'] ?? 0));
+        $tiemnang = max(0, (int)($_POST['tiemnang'] ?? 0));
+        // data_point: [limitPower, power, tiemNang, ...] theo thứ tự server game đọc.
+        $dp = json_decode($p['data_point'], true);
+        if (!is_array($dp) || count($dp) < 3) {
+            flash('data_point của nhân vật không hợp lệ.', 'danger');
+        } elseif ($sucmanh + $tiemnang <= 0) {
+            flash('Nhập sức mạnh hoặc tiềm năng lớn hơn 0.', 'danger');
         } else {
-            $st = $conn->prepare("UPDATE player SET items_bag = ? WHERE id = ?");
-            $st->bind_param("si", $bag, $p['id']); $st->execute();
-            flash("Đã buff x$soluong vật phẩm #$id cho $player_name. Người chơi cần thoát game trước khi buff.");
+            $dp[1] += $sucmanh;
+            $dp[2] += $tiemnang;
+            $json = json_encode($dp);
+            $st = $conn->prepare("UPDATE player SET data_point = ? WHERE id = ?");
+            $st->bind_param("si", $json, $p['id']); $st->execute();
+            flash("Đã cộng " . number_format($sucmanh) . " sức mạnh, " . number_format($tiemnang) . " tiềm năng cho $player_name.");
+        }
+    } else {
+        $id = (int)($_POST['id'] ?? 0);
+        $soluong = (int)($_POST['soluong'] ?? 0);
+        $params = (array)($_POST['param'] ?? []);
+        $opts = [];
+        foreach ((array)($_POST['option'] ?? []) as $i => $o) $opts[] = '[' . (int)$o . ',' . (int)($params[$i] ?? 0) . ']';
+        if (!$opts) $opts = ['[73,1]'];
+        if ($id <= 0 || $soluong <= 0) {
+            flash('ID vật phẩm và số lượng phải lớn hơn 0.', 'danger');
+        } else {
+            // Ghi vào ô trống đầu tiên trong items_bag. Định dạng chuỗi giữ nguyên theo game server.
+            $q = "\\\\\\\\\\\"";
+            $replacement = "[$id, $soluong,\\\"[$q" . implode("$q,$q", $opts) . "$q]\\\"";
+            $bag = preg_replace('/\[-1,0,\\\"\[\]\\\"/', $replacement, $p['items_bag'], 1, $count);
+            if ($count === 0 || empty($bag)) {
+                flash('Hành trang đầy hoặc không tìm thấy ô trống.', 'danger');
+            } else {
+                $st = $conn->prepare("UPDATE player SET items_bag = ? WHERE id = ?");
+                $st->bind_param("si", $bag, $p['id']); $st->execute();
+                flash("Đã buff x$soluong vật phẩm #$id (" . count($opts) . " chỉ số) cho $player_name. Người chơi cần thoát game trước khi buff.");
+            }
         }
     }
     redirect_self();
@@ -47,22 +67,33 @@ cms_header('Buff vật phẩm');
       <datalist id="itemlist"><?php foreach ($items as $it): ?><option value="<?= $it['id'] ?> - <?= h($it['NAME']) ?>"><?php endforeach; ?></datalist>
     </div>
     <div class="form-group"><label>Số lượng</label><input class="form-control" name="soluong" type="number" min="1" value="1" required></div>
-    <div class="form-group"><label>Chỉ số</label>
-      <select class="form-control" name="option_type" onchange="document.getElementById('optionFields').style.display = this.value === 'has_option' ? '' : 'none'">
-        <option value="no_option">Không chọn chỉ số</option><option value="has_option">Có chỉ số</option></select></div>
-    <div id="optionFields" style="display:none">
-      <div class="form-group"><label>Loại chỉ số</label>
-        <select class="form-control" name="option"><?php foreach ($options as $o): ?><option value="<?= $o['id'] ?>"><?= $o['id'] ?> - <?= h($o['NAME']) ?></option><?php endforeach; ?></select></div>
-      <div class="form-group"><label>Giá trị chỉ số (VD: 10 = 10%)</label><input class="form-control" name="param" type="number" value="10"></div>
+    <div class="form-group"><label>Chỉ số <small class="text-muted">(không thêm dòng nào = không chỉ số)</small></label>
+      <div id="optRows"></div>
+      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addOpt()">+ Thêm chỉ số</button>
     </div>
+    <template id="optTpl"><div class="form-row mb-2">
+      <div class="col-7"><select class="form-control" name="option[]"><?php foreach ($options as $o): ?><option value="<?= $o['id'] ?>"><?= $o['id'] ?> - <?= h($o['NAME']) ?></option><?php endforeach; ?></select></div>
+      <div class="col-4"><input class="form-control" name="param[]" type="number" value="10" title="Giá trị chỉ số (VD: 10 = 10%)" required></div>
+      <div class="col-1"><button type="button" class="btn btn-outline-danger" onclick="this.closest('.form-row').remove()">&times;</button></div>
+    </div></template>
     <button class="btn btn-main">Buff</button>
+  </form>
+</div></div>
+<div class="card shadow-sm mt-3"><div class="card-body">
+  <h6>Buff sức mạnh / tiềm năng</h6>
+  <form method="post"><?= csrf_field() ?><input type="hidden" name="action" value="point">
+    <div class="form-group"><label>Tên nhân vật</label><input class="form-control" name="player_name" required></div>
+    <div class="form-group"><label>Sức mạnh cộng thêm</label><input class="form-control" name="sucmanh" type="number" min="0" value="0"></div>
+    <div class="form-group"><label>Tiềm năng cộng thêm</label><input class="form-control" name="tiemnang" type="number" min="0" value="0"></div>
+    <button class="btn btn-main">Cộng</button>
   </form>
 </div></div>
 </div>
 <div class="col-lg-6"><div class="alert alert-warning">
-  <b>Lưu ý</b><br>- Người chơi phải thoát game trước khi buff, nếu không server sẽ ghi đè hành trang.<br>- Chỉ dùng chỉ số thực sự có, chọn sai gây lỗi vật phẩm.<br>- Ví dụ: Thỏi vàng là ID 457.
+  <b>Lưu ý</b><br>- Người chơi phải thoát game trước khi buff, nếu không server sẽ ghi đè hành trang / chỉ số.<br>- Chỉ dùng chỉ số thực sự có, chọn sai gây lỗi vật phẩm.<br>- Ví dụ: Thỏi vàng là ID 457.
 </div></div></div>
 <script>
+function addOpt() { document.getElementById('optRows').appendChild(document.getElementById('optTpl').content.cloneNode(true)); }
 function pickId() {
   var v = document.getElementById('item_pick').value.trim();
   var m = v.match(/^(\d+)/);
