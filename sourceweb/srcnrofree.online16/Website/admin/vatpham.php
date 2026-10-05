@@ -35,7 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     redirect_self();
 }
 
-$items = $conn->query("SELECT id, NAME FROM item_template WHERE NAME <> '' ORDER BY id")->fetch_all(MYSQLI_ASSOC);
+$items = $conn->query("SELECT id, NAME, TYPE FROM item_template WHERE NAME <> '' ORDER BY id")->fetch_all(MYSQLI_ASSOC);
+// Tên loại theo cột TYPE của item_template (đặt theo tên vật phẩm trong DB).
+$typeNames = [0 => 'Áo', 1 => 'Quần', 2 => 'Găng', 3 => 'Giày', 4 => 'Rada', 5 => 'Avatar / vật phẩm thường', 6 => 'Đậu thần', 7 => 'Sách kỹ năng', 8 => 'Đồ ăn / nhiệm vụ', 9 => 'Vàng', 10 => 'Ngọc', 11 => 'Ngọc rồng Namek', 12 => 'Ngọc rồng', 13 => 'Bùa', 14 => 'Đá cường hóa', 17 => 'Đai lưng', 22 => 'Vệ tinh', 23 => 'Thú cưỡi', 24 => 'Thú cưỡi VIP', 25 => 'Sách tuyệt kỹ', 27 => 'Đồ ăn / capsule', 28 => 'Cờ', 29 => 'Thuốc / buff', 30 => 'Sao pha lê', 31 => 'Trung thu', 32 => 'Giáp tập luyện', 33 => 'Mảnh thú', 36 => 'Danh hiệu', 37 => 'Sách kỹ năng 2', 75 => 'Vật phẩm đặc biệt'];
+$types = array_unique(array_column($items, 'TYPE')); sort($types);
 $options = $conn->query("SELECT id, NAME FROM item_option_template WHERE NAME <> '' ORDER BY id")->fetch_all(MYSQLI_ASSOC);
 
 // Các chỉ số tiềm năng / sức mạnh có tham số, ghim lên đầu danh sách cho dễ chọn.
@@ -48,9 +51,10 @@ cms_header('Buff vật phẩm');
   <form method="post" onsubmit="return pickId()"><?= csrf_field() ?>
     <div class="form-group"><label>Tên nhân vật</label><input class="form-control" name="player_name" required></div>
     <div class="form-group"><label>Vật phẩm <small class="text-muted">(gõ tên hoặc ID để tìm, <?= count($items) ?> vật phẩm)</small></label>
+      <select class="form-control mb-2" id="item_type" onchange="fillItems()"><option value="">Tất cả loại</option><?php foreach ($types as $t): ?><option value="<?= $t ?>"><?= $t ?> - <?= h($typeNames[$t] ?? 'Loại ' . $t) ?></option><?php endforeach; ?></select>
       <input class="form-control" list="itemlist" id="item_pick" placeholder="VD: Thỏi vàng" autocomplete="off" required>
       <input type="hidden" name="id" id="id">
-      <datalist id="itemlist"><?php foreach ($items as $it): ?><option value="<?= $it['id'] ?> - <?= h($it['NAME']) ?>"><?php endforeach; ?></datalist>
+      <datalist id="itemlist"></datalist>
     </div>
     <div class="form-group"><label>Số lượng</label><input class="form-control" name="soluong" type="number" min="1" value="1" required></div>
     <div class="form-group"><label>Chỉ số <small class="text-muted">(không thêm dòng nào = không chỉ số)</small></label>
@@ -72,6 +76,13 @@ cms_header('Buff vật phẩm');
   <b>Lưu ý</b><br>- Người chơi phải thoát game trước khi buff, nếu không server sẽ ghi đè hành trang.<br>- Chỉ dùng chỉ số thực sự có, chọn sai gây lỗi vật phẩm.<br>- Ví dụ: Thỏi vàng là ID 457.
 </div></div></div>
 <script>
+var ITEMS = <?= json_encode(array_map(fn($i) => [(int)$i['id'], $i['NAME'], (int)$i['TYPE']], $items), JSON_UNESCAPED_UNICODE) ?>;
+function fillItems() {
+  var t = document.getElementById('item_type').value, dl = document.getElementById('itemlist'), html = '';
+  ITEMS.forEach(function (i) { if (t === '' || i[2] == t) html += '<option value="' + i[0] + ' - ' + i[1].replace(/"/g, '&quot;') + '">'; });
+  dl.innerHTML = html;
+}
+fillItems();
 function addOpt() { document.getElementById('optRows').appendChild(document.getElementById('optTpl').content.cloneNode(true)); }
 function pickId() {
   var v = document.getElementById('item_pick').value.trim();

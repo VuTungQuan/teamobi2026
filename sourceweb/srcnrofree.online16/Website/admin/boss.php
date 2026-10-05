@@ -28,20 +28,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     redirect_self();
 }
 
-// Tên boss lấy từ source server (new BossData("Tên", ...)); nếu không có source thì nhập tay.
-$bosses = [];
+// Đọc source server: tên boss (new BossData("Tên")) và map hằng BossID -> tên qua super(BossID.X, ..., BossesData.Y / new BossData("Tên")).
+$bosses = []; $bossNames = []; $dataNames = [];
 $dir = SERVER_DIR . '/src/nro/models/boss';
 if (is_dir($dir)) {
+    // Đọc BossesData.java trước để các file boss duyệt sau tra được tên.
+    if (preg_match_all('/(\w+)\s*=\s*new BossData\(\s*"([^"]+)"/', (string)@file_get_contents("$dir/BossesData.java"), $m, PREG_SET_ORDER)) foreach ($m as $x) $dataNames[$x[1]] = $x[2];
     foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir)) as $f) {
-        if (substr($f, -5) === '.java' && preg_match_all('/new BossData\(\s*"([^"]+)"/', file_get_contents($f), $m)) $bosses = array_merge($bosses, $m[1]);
+        if (substr($f, -5) !== '.java') continue;
+        $src = file_get_contents($f);
+        if (preg_match_all('/(\w+)\s*=\s*new BossData\(\s*"([^"]+)"/', $src, $m, PREG_SET_ORDER)) foreach ($m as $x) $dataNames[$x[1]] = $x[2];
+        if (preg_match_all('/new BossData\(\s*"([^"]+)"/', $src, $m)) $bosses = array_merge($bosses, $m[1]);
+        if (preg_match_all('/super\((.*?)\);/s', $src, $m)) foreach ($m[1] as $sup) {
+            if (!preg_match('/BossID\.(\w+)/', $sup, $c)) continue;
+            $names = [];
+            if (preg_match_all('/BossesData\.(\w+)/', $sup, $d)) foreach ($d[1] as $k) $names[] = $dataNames[$k] ?? $k;
+            if (preg_match_all('/new BossData\(\s*"([^"]+)"/', $sup, $d)) $names = array_merge($names, $d[1]);
+            if ($names) $bossNames[$c[1]] = implode(' / ', array_unique($names));
+        }
     }
     $bosses = array_unique($bosses); sort($bosses, SORT_LOCALE_STRING);
 }
-
-// ID boss lấy từ BossID.java (TÊN = -số), dùng cho triệu hồi.
+// Danh sách boss triệu hồi: [hằng, id, tên] từ BossID.java.
 $bossIds = [];
 if (is_file($f = SERVER_DIR . '/src/nro/models/boss/BossID.java') && preg_match_all('/int\s+(\w+)\s*=\s*(-?\d+)\s*;/', file_get_contents($f), $m, PREG_SET_ORDER)) {
-    foreach ($m as $x) $bossIds[] = "$x[1] ($x[2])";
+    foreach ($m as $x) $bossIds[] = [$x[1], (int)$x[2], $bossNames[$x[1]] ?? ''];
 }
 $pending = ($r = $conn->query("SHOW TABLES LIKE 'boss_call'")) && $r->num_rows ? (int)$conn->query("SELECT COUNT(*) FROM boss_call")->fetch_row()[0] : 0;
 
@@ -58,11 +69,16 @@ cms_header('Phần thưởng diệt boss');
   <form method="post" class="form-inline"><?= csrf_field() ?><input type="hidden" name="do" value="call">
     <label class="mr-2 font-weight-bold">Triệu hồi boss</label>
     <input class="form-control mr-2" list="bossids" name="boss_id" required autocomplete="off" placeholder="gõ tên hoặc ID boss (<?= count($bossIds) ?>)" style="width:320px">
-    <datalist id="bossids"><?php foreach ($bossIds as $b): ?><option value="<?= h($b) ?>"><?php endforeach; ?></datalist>
+    <datalist id="bossids"><?php foreach ($bossIds as $b): ?><option value="<?= h("$b[0] ($b[1])") ?>"><?= h($b[2]) ?></option><?php endforeach; ?></datalist>
     <button class="btn btn-danger"><i class="fa fa-bolt"></i> Triệu hồi</button>
     <?php if ($pending): ?><span class="ml-3 text-warning"><?= $pending ?> lệnh chưa được server xử lý (server tắt hoặc chưa build kèm BossCallDB.java)</span><?php endif; ?>
   </form>
   <small class="text-muted">Boss đang nghỉ sẽ xuất hiện ngay; boss đang hoạt động thì tạo thêm một con. Boss ra ở map mặc định của nó.</small>
+  <div class="mt-2"><input class="form-control form-control-sm mb-2" placeholder="Lọc danh sách boss" oninput="var v=this.value.toLowerCase();document.querySelectorAll('#bosstable tr').forEach(function(r){r.style.display=r.textContent.toLowerCase().indexOf(v)<0?'none':''})" style="width:320px">
+  <div style="max-height:300px;overflow:auto"><table class="table table-sm table-hover mb-0" id="bosstable">
+  <?php foreach ($bossIds as $b): ?><tr><td><?= h($b[2] ?: '(không rõ tên)') ?></td><td><code><?= h($b[0]) ?></code></td><td><?= $b[1] ?></td>
+    <td class="text-right"><form method="post"><?= csrf_field() ?><input type="hidden" name="do" value="call"><input type="hidden" name="boss_id" value="<?= $b[1] ?>"><button class="btn btn-sm btn-outline-danger py-0">Triệu hồi</button></form></td></tr><?php endforeach; ?>
+  </table></div></div>
 </div></div>
 <div class="d-flex mb-3">
   <form class="form-inline"><input class="form-control mr-2" name="q" value="<?= h($q) ?>" placeholder="Lọc theo boss"><button class="btn btn-main">Lọc</button></form>
