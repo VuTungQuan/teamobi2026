@@ -17,6 +17,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $conn->query("DELETE FROM boss_reward WHERE id = $id");
             flash("Đã xóa phần thưởng #$id", 'warning');
             break;
+        case 'call':
+            if (!preg_match('/(-?\d+)\)?$/', trim($_POST['boss_id']), $m)) { flash('Chọn boss trong danh sách.', 'danger'); break; }
+            $bid = (int)$m[1];
+            $conn->query("CREATE TABLE IF NOT EXISTS boss_call (id INT AUTO_INCREMENT PRIMARY KEY, boss_id INT NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
+            $st = $conn->prepare("INSERT INTO boss_call (boss_id) VALUES (?)"); $st->bind_param("i", $bid); $st->execute();
+            flash("Đã gửi lệnh triệu hồi boss $bid. Server game đọc lệnh trong vòng 5 giây.");
+            break;
     }
     redirect_self();
 }
@@ -31,6 +38,13 @@ if (is_dir($dir)) {
     $bosses = array_unique($bosses); sort($bosses, SORT_LOCALE_STRING);
 }
 
+// ID boss lấy từ BossID.java (TÊN = -số), dùng cho triệu hồi.
+$bossIds = [];
+if (is_file($f = SERVER_DIR . '/src/nro/models/boss/BossID.java') && preg_match_all('/int\s+(\w+)\s*=\s*(-?\d+)\s*;/', file_get_contents($f), $m, PREG_SET_ORDER)) {
+    foreach ($m as $x) $bossIds[] = "$x[1] ($x[2])";
+}
+$pending = ($r = $conn->query("SHOW TABLES LIKE 'boss_call'")) && $r->num_rows ? (int)$conn->query("SELECT COUNT(*) FROM boss_call")->fetch_row()[0] : 0;
+
 $q = trim($_GET['q'] ?? ''); $like = "%$q%";
 $st = $conn->prepare("SELECT r.*, i.NAME AS item_name FROM boss_reward r LEFT JOIN item_template i ON i.id = r.item_id WHERE r.boss_name LIKE ? ORDER BY r.boss_name, r.id");
 $st->bind_param("s", $like); $st->execute();
@@ -40,6 +54,16 @@ $items = $conn->query("SELECT id, NAME FROM item_template WHERE NAME <> '' ORDER
 cms_header('Phần thưởng diệt boss');
 ?>
 <div class="alert alert-warning py-2">Bảng này chỉ có tác dụng khi server game được build lại kèm file <code>BossRewardDB.java</code> (đã đặt sẵn trong source server). Server hiện tại vẫn dùng phần thưởng hardcode trong code Java.</div>
+<div class="card shadow-sm mb-3"><div class="card-body">
+  <form method="post" class="form-inline"><?= csrf_field() ?><input type="hidden" name="do" value="call">
+    <label class="mr-2 font-weight-bold">Triệu hồi boss</label>
+    <input class="form-control mr-2" list="bossids" name="boss_id" required autocomplete="off" placeholder="gõ tên hoặc ID boss (<?= count($bossIds) ?>)" style="width:320px">
+    <datalist id="bossids"><?php foreach ($bossIds as $b): ?><option value="<?= h($b) ?>"><?php endforeach; ?></datalist>
+    <button class="btn btn-danger"><i class="fa fa-bolt"></i> Triệu hồi</button>
+    <?php if ($pending): ?><span class="ml-3 text-warning"><?= $pending ?> lệnh chưa được server xử lý (server tắt hoặc chưa build kèm BossCallDB.java)</span><?php endif; ?>
+  </form>
+  <small class="text-muted">Boss đang nghỉ sẽ xuất hiện ngay; boss đang hoạt động thì tạo thêm một con. Boss ra ở map mặc định của nó.</small>
+</div></div>
 <div class="d-flex mb-3">
   <form class="form-inline"><input class="form-control mr-2" name="q" value="<?= h($q) ?>" placeholder="Lọc theo boss"><button class="btn btn-main">Lọc</button></form>
   <button class="btn btn-success ml-auto" data-toggle="collapse" data-target="#new"><i class="fa fa-plus"></i> Thêm phần thưởng</button>

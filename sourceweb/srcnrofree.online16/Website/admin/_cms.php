@@ -3,7 +3,7 @@
 if (session_status() == PHP_SESSION_NONE) session_start();
 include_once __DIR__ . '/../connect.php';
 // Thư mục source/chạy của server game (Config.properties, src/...). Đổi nếu chuyển máy.
-const SERVER_DIR = 'C:/Users/AD/Downloads/Teamobi2026/SRC';
+const SERVER_DIR = 'D:/Code/teamobi2026/Teamobi2026/SRC';
 
 $cms_user = $_SESSION['username'] ?? $_SESSION['account'] ?? null;
 $cms_admin = null;

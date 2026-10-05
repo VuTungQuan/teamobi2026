@@ -10,6 +10,7 @@ import nro.models.boss.Android.Pic;
 import nro.models.boss.Android.Poc;
 import nro.models.boss.Black_Goku.BlackGoku;
 import nro.models.boss.Boss;
+import nro.models.boss.BossCallDB;
 import nro.models.boss.BossID;
 import nro.models.boss.Boss_mini.AnTrom;
 import nro.models.boss.Boss_mini.Odo;
@@ -441,6 +442,7 @@ public class BossManager implements Runnable {
         while (ServerManager.isRunning) {
             try {
                 long st = System.currentTimeMillis();
+                BossCallDB.poll(); // triệu hồi boss từ CMS
                 for (Boss boss : this.bosses) {
                     boss.update();
                 }
