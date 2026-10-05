@@ -2,8 +2,9 @@
 // Guard + layout dùng chung cho CMS. Mọi trang admin include file này đầu tiên.
 if (session_status() == PHP_SESSION_NONE) session_start();
 include_once __DIR__ . '/../connect.php';
-// Thư mục source/chạy của server game (Config.properties, src/...). Đổi nếu chuyển máy.
-const SERVER_DIR = 'D:/Code/teamobi2026/Teamobi2026/SRC';
+// Thư mục source/chạy của server game (Config.properties, src/...). Ưu tiên vị trí trong repo
+// (web chạy thẳng từ repo); không có thì dùng đường dẫn cố định, đổi nếu chuyển máy.
+define('SERVER_DIR', is_dir($d = __DIR__ . '/../../../../Teamobi2026/SRC') ? $d :'D:/Code/teamobi2026/Teamobi2026/SRC');
 
 $cms_user = $_SESSION['username'] ?? $_SESSION['account'] ?? null;
 $cms_admin = null;

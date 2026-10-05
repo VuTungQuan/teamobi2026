@@ -54,6 +54,14 @@ $bossIds = [];
 if (is_file($f = SERVER_DIR . '/src/nro/models/boss/BossID.java') && preg_match_all('/int\s+(\w+)\s*=\s*(-?\d+)\s*;/', file_get_contents($f), $m, PREG_SET_ORDER)) {
     foreach ($m as $x) $bossIds[] = [$x[1], (int)$x[2], $bossNames[$x[1]] ?? ''];
 }
+// Máy chạy web không có source server: dùng danh sách lưu sẵn trong _bosses.json (tự cập nhật khi mở trang ở máy có source).
+$cache = __DIR__ . '/_bosses.json';
+if ($bossIds) {
+    $json = json_encode([$bossIds, array_values($bosses)], JSON_UNESCAPED_UNICODE);
+    if ($json !== @file_get_contents($cache)) @file_put_contents($cache, $json);
+} elseif (is_file($cache)) {
+    [$bossIds, $bosses] = json_decode(file_get_contents($cache), true);
+}
 $pending = ($r = $conn->query("SHOW TABLES LIKE 'boss_call'")) && $r->num_rows ? (int)$conn->query("SELECT COUNT(*) FROM boss_call")->fetch_row()[0] : 0;
 
 $q = trim($_GET['q'] ?? ''); $like = "%$q%";
