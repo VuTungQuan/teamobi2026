@@ -23,6 +23,9 @@ public class BossCallDB {
         if (System.currentTimeMillis() - lastPoll < POLL_MS) {
             return;
         }
+        if (lastPoll == 0) {
+            Logger.log(Logger.YELLOW, "BossCallDB: bật, đọc bảng boss_call mỗi " + POLL_MS / 1000 + "s\n");
+        }
         lastPoll = System.currentTimeMillis();
         List<Integer> done = new ArrayList<>();
         try (Connection con = LocalManager.getConnection()) {

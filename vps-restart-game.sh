@@ -6,9 +6,10 @@ cd "$(dirname "$0")"
 
 SRC=Teamobi2026/SRC
 
-echo "=== Pull code (reset sạch về bản GitHub) ==="
-git fetch origin
-git reset --hard origin/main
+# reset --hard trong vps-restart-web.sh xoá luôn patch web (DB host, domain) -> gọi script web để pull + áp lại patch web,
+# nếu không web sẽ lỗi "mysqli ... localhost" sau mỗi lần restart game.
+echo "=== Pull code + áp lại patch web ==="
+bash ./vps-restart-web.sh
 
 echo "=== Patch DB host: localhost -> db ==="
 sed -i 's/^database.host=localhost/database.host=db/' "$SRC/Config.properties"
